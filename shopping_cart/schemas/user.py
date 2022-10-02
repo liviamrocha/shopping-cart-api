@@ -1,10 +1,8 @@
 from datetime import datetime
-from time import sleep
-from email.policy import default
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field
 from pydantic.networks import EmailStr
 
-
+# Modelo base de um usuário (para cadastro)
 class UserSchema(BaseModel):
     name: str = Field(None, min_length=3, max_length=100)
     email: EmailStr = Field(unique=True, index=True)
@@ -13,10 +11,7 @@ class UserSchema(BaseModel):
     is_admin: bool = Field(default=False)
     created_at: datetime = datetime.now()
     
-    class Config:
-        pass
-    
-
+# Modelo de retorno de um documento de usuário
 def user_helper(user) -> dict:
     return{
         "id": str(user["_id"]),

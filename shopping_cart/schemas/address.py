@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 from shopping_cart.schemas.user import UserSchema
 
 
+# Modelo base de um endereço (para cadastro)
 class Address(BaseModel):
     street: str = Field(None, min_length=3, max_length=200)
     number: int 
@@ -11,11 +12,12 @@ class Address(BaseModel):
     zip_code: int
     is_delivery: bool
     
-    
+# Modelo base de criação de uma lista de endereços do usuário
 class AddressSchema(BaseModel):
     user: UserSchema
     address: List[Address]
-    
+
+# Modelo de retorno de um documento de endereço com os dados do usuário
 def address_helper(address) -> dict:
     user_address = {
         "id": str(address["_id"]),
