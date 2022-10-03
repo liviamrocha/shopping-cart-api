@@ -28,15 +28,3 @@ async def get_all():
 async def password_update(email: str, new_password: str):
     update = await update_password(email, new_password)
     return update
-
-# Criar um endereço
-@router.post('/address')
-async def create_address_user(user: UserSchema, address: Address):
-    data = await create_address(user, address)
-    return data
-
-# Buscar um endereço pelo e-mail
-@router.get("/address")
-async def get_address(email: str):
-    user = await find_address_by_email(email)
-    return user
