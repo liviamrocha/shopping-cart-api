@@ -55,7 +55,7 @@ async def get_all_users():
 async def update_password(email: str, new_password: str):
     try:
         # Busca o usuário no banco de dados, atualiza a senha e retorna a mensagem
-        user = await db.user_db.find_one_and_update(
+        await db.user_db.find_one_and_update(
             {"email": email},
             {"$set":
                 {"password": new_password}})
@@ -73,12 +73,12 @@ async def create_address(user: UserSchema, address: Address):
         busca = await db.address_db.find_one({"user.email": user.email})
         # Caso o usuário não exista, cria o usuário e uma lista vazia de endereço
         if not busca:
-            insert = await db.address_db.insert_one({
+            await db.address_db.insert_one({
                 "user": dict(user),
                 "address": []
             })
         # Busca o usuário, adiciona o endereço e retorna a mensagem
-        res = await db.address_db.find_one_and_update(
+        await db.address_db.find_one_and_update(
             {"user.email": user.email},
             {"$addToSet": {"address": dict(address)}}
         )
@@ -94,7 +94,9 @@ async def find_address_by_email(email: str):
     try:
         # Busca um usuário pelo e-mail e retorna no modelo do "helper"
         user_email = await db.address_db.find_one({"user.email": email})
-        return address_helper(user_email)
+        if user_email:
+            return address_helper(user_email)
+        return {"message": "Usuário não possui endereço cadastrado"}
     
     # Retona a mensagem de erro
     except Exception as e:
