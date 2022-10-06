@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from shopping_cart.schemas.product import ProductSchema, ProductUpdateSchema
+from shopping_cart.schemas.product import ProductSchema, ProductUpdateSchema, ProductResponse
 from shopping_cart.cruds.product import (
     create_product,
     list_products,
@@ -17,17 +17,21 @@ async def post_product(product: ProductSchema):
 
 @router.get('')
 async def get_products():
-    return await list_products()
+    products = await list_products()
+    return products
 
-@router.get('/name')
+@router.get('/name', response_model=ProductResponse)
 async def get_product_by_name(name: str):
-    return await product_by_name(name)
+    product = await product_by_name(name)
+    print(product)
+    return product
 
-@router.get('/id')
+@router.get('/id', response_model=ProductResponse)
 async def get_product_by_id(id: int):
-    return await product_by_id(id)
+    product = await product_by_id(id)
+    return product
 
-@router.put('/id')
+@router.put('/id') # Adicioanr response model
 async def put_product(id: int, product_data: ProductUpdateSchema): 
     return await update_product(id, product_data)
 
