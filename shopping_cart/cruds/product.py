@@ -1,4 +1,5 @@
-from shopping_cart.schemas.product import ProductSchema, product_helper
+from shopping_cart.schemas.product import ProductSchema, ProductResponse
+from bson import ObjectId
 from shopping_cart.server.database import db
 
 
@@ -19,7 +20,7 @@ async def list_products():
     try:
         product_cursor = db.product_db.find()
         products = [
-            product_helper(product)
+            ProductResponse(**product)
             async for product in product_cursor
         ]
         return products
@@ -30,18 +31,21 @@ async def list_products():
 async def product_by_id(code: int):
     try:
         product = await db.product_db.find_one({"code": code})
+        print(product)
         if product:
-            return product_helper(product)
+            return ProductResponse(**product)
     except Exception as e:
         print(f'get_user_by_id.error: {e}')
+
 
 async def product_by_name(name):
     try:
         product = await db.product_db.find_one({"name": name})
         if product:
-            return product_helper(product)
+            return ProductResponse(**product)
     except Exception as e:
             print(f'get_user_by_name.error: {e}')
+
             
 async def update_product(code, product_data):
     try:
@@ -56,6 +60,7 @@ async def update_product(code, product_data):
         return False, 0
     except Exception as e:
         print(f'update_product.error: {e}')
+
 
 async def remove_product(code):
     try:
