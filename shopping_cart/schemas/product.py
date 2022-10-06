@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from shopping_cart.schemas.utils import AllOptional
 
 class ProductSchema(BaseModel):
     name: str = Field(max_length=100)
@@ -8,21 +9,10 @@ class ProductSchema(BaseModel):
     image: str
     code: int 
 
-class ProductUpdateSchema(BaseModel):
-    name: Optional[str]
-    description: Optional[str]
-    price: Optional[float]
-    image: Optional[str]
+class ProductUpdateSchema(ProductSchema, metaclass=AllOptional):
+    pass
+class ProductResponse(ProductSchema):
+    pass
 
-
-# Modelo de retorno de um documento de product
-def product_helper(product) -> dict:
-    return{
-        "name": product["name"],
-        "description": product["description"],
-        "price": product["price"],
-        "image": product["image"],
-        "code": product["code"],
-    }
 
 
