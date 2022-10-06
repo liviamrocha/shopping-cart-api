@@ -5,7 +5,7 @@ from shopping_cart.schemas.utils import AllOptional
 class ProductSchema(BaseModel):
     name: str = Field(max_length=100)
     description: str
-    price: float
+    price: float = Field(gt=0.01)
     image: str
     code: int 
 
