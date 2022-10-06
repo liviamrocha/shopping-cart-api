@@ -10,7 +10,7 @@ class ProductSchema(BaseModel):
     code: int 
 
 class ProductUpdateSchema(ProductSchema, metaclass=AllOptional):
-    pass
+    price: float = Field(gt=0.01)
 class ProductResponse(ProductSchema):
     pass
 
