@@ -55,11 +55,13 @@ async def get_all_users():
 async def update_password(email: str, new_password: str):
     try:
         # Busca o usuário no banco de dados, atualiza a senha e retorna a mensagem
-        await db.user_db.find_one_and_update(
+        update = await db.user_db.find_one_and_update(
             {"email": email},
             {"$set":
                 {"password": new_password}})
-        return {"message": "Senha atualizada"}
+        if update:
+            return {"message": "Senha atualizada"}
+        return {"message": "Usuário não encontrado"}
     
     # Retona a mensagem de erro
     except Exception as e:
