@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from shopping_cart.schemas.product import ProductSchema, ProductUpdateSchema, ProductResponse
 from shopping_cart.cruds.product import (
     create_product,
@@ -11,7 +11,7 @@ from shopping_cart.cruds.product import (
 
 router = APIRouter(tags=['Products'], prefix='/products')
 
-@router.post('')
+@router.post('', status_code=status.HTTP_201_CREATED)
 async def post_product(product: ProductSchema):
     return await create_product(product)
 
@@ -31,7 +31,7 @@ async def get_product_by_id(id: int):
     product = await product_by_id(id)
     return product
 
-@router.put('/id') # Adicioanr response model
+@router.put('/id', status_code=status.HTTP_201_CREATED) # Adicioanr response model
 async def put_product(id: int, product_data: ProductUpdateSchema): 
     return await update_product(id, product_data)
 
