@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from pydantic.networks import EmailStr
 from shopping_cart.schemas.address import Address
 from shopping_cart.schemas.user import UserSchema
 from shopping_cart.cruds.user import create_address, create_user, get_all_users, get_user_by_email, update_password, find_address_by_email
@@ -13,7 +14,7 @@ async def post_user(user: UserSchema):
 
 # Buscar um usuário pelo e-mail
 @router.get('/email/')
-async def get_user_email(email: str):
+async def get_user_email(email: EmailStr):
     user = await get_user_by_email(email)
     return user
 
