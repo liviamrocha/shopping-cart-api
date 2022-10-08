@@ -16,10 +16,10 @@ async def create_order(email: EmailStr):
         address = await db.address_db.find_one({"user.email": email, "address.is_delivery": True})
         if not address:
             return {"message": "Usuário não possui endereço de entrega cadastrado"}
-        print(address)
+        # TODO
         db.cart_db.aggregate([
             {"$match": { "user.email": email }},
-            {"$merge": {"into": db.order_db}},
+            {"$merge": {"into": "shopping_cart.order"}},
             {"$addFields": {"address": address}}
         ])
         return {"message": "vixi maria"}
