@@ -74,7 +74,8 @@ async def remove_product_cart(user: UserSchema, order_item: OrderItemSchema):
 # Retorna o carrinho do usuário
 async def find_cart_by_email(email: EmailStr):
     try:
-        find_cart = await db.cart_db.find_one({"cart.user.email": email})
+        find_cart = await db.cart_db.find_one({"user.email": email})
+        print(find_cart)
         if not find_cart:
             return {"message": "Usuário não possui um carrinho"}
         return cart_helper(find_cart)

@@ -15,27 +15,28 @@ class CartSchema(BaseModel):
 def cart_helper(cart) -> dict:
     products_list = []
     
-    for item in cart["order_items"]:
-        product = {
-            "name": item["product"]["name"],
-            "description": item["product"]["description"],
-            "price": item["product"]["price"],
-            "material": item["product"]["material"],
-            "inmetro": item["product"]["inmetro"],
-            "code": item["product"]["code"],
-            "stock": item["product"]["stock"],
-            "quantity": item["quantity"],
-        }
-        products_list.append(product)
+    if len(cart["order_items"]) > 0:
+        for item in cart["order_items"]:
+            product = {
+                "name": item["product"]["name"],
+                "description": item["product"]["description"],
+                "price": item["product"]["price"],
+                "material": item["product"]["material"],
+                "inmetro": item["product"]["inmetro"],
+                "code": item["product"]["code"],
+                "stock": item["product"]["stock"],
+                "quantity": item["quantity"],
+            }
+            products_list.append(product)
         
     return {
         "id": str(cart["_id"]),
-        "name": cart.user["name"],
-        "email": cart.user["email"],
-        "password": cart.user["password"],
-        "is_active": cart.user["is_active"],
-        "is_admin": cart.user["is_admin"],
-        "created_at": cart.user["created_at"],
+        "name": cart["user"]["name"],
+        "email": cart["user"]["email"],
+        "password": cart["user"]["password"],
+        "is_active": cart["user"]["is_active"],
+        "is_admin": cart["user"]["is_admin"],
+        "created_at": cart["user"]["created_at"],
         "order_items": products_list,
         "total_quantity": cart["total_quantity"],
         "total_price": cart["total_price"],
