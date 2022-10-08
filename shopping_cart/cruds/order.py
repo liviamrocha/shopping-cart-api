@@ -1,4 +1,5 @@
 from pydantic import EmailStr
+from shopping_cart.schemas.order import order_helper
 from shopping_cart.server.database import db
 
 
@@ -15,7 +16,7 @@ async def create_order(email: EmailStr):
         if not address:
             return {"message": "Usuário não possui endereço de entrega cadastrado"}
         # TODO
-        db.cart_db.aggregate([
+        agora_vai = db.cart_db.aggregate([
             {"$match": { "user.email": email}},
             {"$merge": {"into": "order"}},
             {"$addFields": {"address": dict(address)}}
