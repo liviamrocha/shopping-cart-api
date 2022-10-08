@@ -1,3 +1,4 @@
+from genericpath import exists
 from gettext import find
 from wsgiref import validate
 from pydantic import EmailStr
@@ -40,14 +41,26 @@ async def add_product_cart(email: EmailStr, code: int, quantity: int):
         if not validate_product: #or validate_product.stock == 0:
             return {"message": "O produto não está disponível"}
         
-        order_item = OrderItemSchema()
-        order_item.product = validate_product
-        order_item.quantity = quantity
-        
-        # Caso exista carrinho e o produto esteja disponível, adiciona ao carrinho
-        await db.cart_db.find_one_and_update(
-            {"user.email": email},
-            {"$addToSet": {"order_items": order_item.dict()}})
+        # Valida se o produto já existe no carrinho e altera a quantidade
+        product_exists = await db.cart_db.find_one({"user.email": email, "order_items.product.code": code})
+        if product_exists:
+            index = 0 
+            for item in product_exists["order_items"]:
+                if item["product"]["code"] == code:
+                    new_quantity = item["quantity"] + quantity
+                    await db.cart_db.find_one_and_update(
+                        {"user.email": email, "order_items.product.code": code},
+                        {"$set": {f"order_items.{index}.quantity": new_quantity}})
+                index += 1
+        else:
+            order_item = OrderItemSchema()
+            order_item.product = validate_product
+            order_item.quantity = quantity
+            # Caso exista carrinho e o produto esteja disponível, adiciona ao carrinho
+            await db.cart_db.find_one_and_update(
+                {"user.email": email},
+                {"$addToSet": {"order_items": order_item.dict()}})
+            
         await db.cart_db.find_one_and_update(
             {"user.email": email},
             [{"$set": {"total_price": find_cart["total_price"] + validate_product["price"] * quantity}},
@@ -90,7 +103,8 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
                 {"$pull": {"order_items": order_item.dict()}})
             await db.cart_db.find_one_and_update(
                 {"user.email": email},
-                [{"$set": {"total_price": find_cart["total_price"] - validate_product["price"] * quantity}},
+                [{"$set": {"order_item.quantity": order_item.quantity - quantity}},
+                {"$set": {"total_price": find_cart["total_price"] - validate_product["price"] * quantity}},
                 {"$set": {"total_quantity": find_cart["total_quantity"] - quantity}}]
             )
             return {"message": "Produto removido do carrinho"}
