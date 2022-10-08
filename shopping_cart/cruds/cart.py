@@ -60,14 +60,33 @@ async def add_product_cart(email: EmailStr, code: int, quantity: int):
             
             
 # Remove um produto do carrinho
-async def remove_product_cart(user: UserSchema, order_item: OrderItemSchema):
+async def remove_product_cart(email: EmailStr, code: int, quantity: int):
         try:
             # Verifica se o usuário possui um carrinho
-            find_cart = await db.cart_db.find_one({"user.email": user.email})
+            find_cart = await db.cart_db.find_one({"user.email": email})
             if not find_cart:
                 return {"message": "Usuário não possui um carrinho"}
+            # Valida se o produto existe e se tem a quantidade a ser removida
+            validate_product = await db.product_db.find_one({"code": code})
+            if not validate_product or validate_product.quantity:
+                return {"message": "O produto não existe"}
             
-            # # Retona a mensagem de erro
+            order_item = OrderItemSchema()
+            order_item.product = validate_product
+            order_item.quantity = quantity
+            
+            # Remove o produto do carrinho
+            await db.cart_db.find_one_and_update(
+                {"user.email": email},
+                {"$pull": {"order_items": order_item.dict()}})
+            await db.cart_db.find_one_and_update(
+                {"user.email": email},
+                [{"$set": {"total_price": find_cart["total_price"] - validate_product["price"] * quantity}},
+                {"$set": {"total_quantity": find_cart["total_quantity"] - quantity}}]
+            )
+            return {"message": "Produto removido do carrinho"}
+        
+        # Retona a mensagem de erro
         except Exception as e:
                 print(f'add_product_to_cart.error: {e}')
                 
