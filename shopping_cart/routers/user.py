@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from pydantic import EmailStr
 from shopping_cart.schemas.address import Address
 from shopping_cart.schemas.user import UserSchema
 from shopping_cart.cruds.user import create_address, create_user, get_all_users, get_user_by_email, update_password, find_address_by_email
@@ -25,6 +26,6 @@ async def get_all():
 
 # Atualizar a senha
 @router.put("/update")
-async def password_update(email: str, new_password: str):
+async def password_update(email: EmailStr, new_password: str):
     update = await update_password(email, new_password)
     return update
