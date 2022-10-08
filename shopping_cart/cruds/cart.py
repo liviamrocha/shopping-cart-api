@@ -41,9 +41,9 @@ async def add_product_cart(user: UserSchema, order_item: OrderItemSchema):
         # Caso existe carrinho e o produto esteja disponível, adiciona ao carrinho
         await db.cart_db.find_one_and_update(
             {"user.email": user.email},
-            {"$addToSet": {"products": dict(order_item.product)}},
-            {"$sum": {"total_quantity": order_item.quantity}}
-            # Total price????
+            {"$addToSet": {"order_items": dict(order_item)}},
+            # TODO Total quantity???
+            # TODO Total price????
         
         )
         # Retona a mensagem de erro
