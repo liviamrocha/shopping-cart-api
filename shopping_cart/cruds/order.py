@@ -1,5 +1,3 @@
-from gettext import find
-
 from pydantic import EmailStr
 from shopping_cart.server.database import db
 
@@ -18,9 +16,9 @@ async def create_order(email: EmailStr):
             return {"message": "Usuário não possui endereço de entrega cadastrado"}
         # TODO
         db.cart_db.aggregate([
-            {"$match": { "user.email": email }},
-            {"$merge": {"into": "shopping_cart.order"}},
-            {"$addFields": {"address": address}}
+            {"$match": { "user.email": email}},
+            {"$merge": {"into": "order"}},
+            {"$addFields": {"address": dict(address)}}
         ])
         return {"message": "vixi maria"}
             
