@@ -92,19 +92,28 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
             validate_product = await db.product_db.find_one({"code": code})
             if not validate_product:
                 return {"message": "O produto não existe"}
-            
-            order_item = OrderItemSchema()
-            order_item.product = validate_product
-            order_item.quantity = quantity
-            
-            # Remove o produto do carrinho
+            # Valida se o produto já existe no carrinho e altera a quantidade
+            product_exists = await db.cart_db.find_one({"user.email": email, "order_items.product.code": code})
+            if product_exists:
+                index = 0 
+                for item in product_exists["order_items"]:
+                    if item["product"]["code"] == code:
+                        new_quantity = item["quantity"] - quantity
+                        await db.cart_db.find_one_and_update(
+                            {"user.email": email, "order_items.product.code": code},
+                            {"$set": {f"order_items.{index}.quantity": new_quantity}})
+                    index += 1
+            else:
+                order_item = OrderItemSchema()
+                order_item.product = validate_product
+                order_item.quantity = quantity
+                # Remove o produto do carrinho
+                await db.cart_db.find_one_and_update(
+                    {"user.email": email},
+                    {"$pull": {"order_items": order_item.dict()}})
             await db.cart_db.find_one_and_update(
                 {"user.email": email},
-                {"$pull": {"order_items": order_item.dict()}})
-            await db.cart_db.find_one_and_update(
-                {"user.email": email},
-                [{"$set": {"order_item.quantity": order_item.quantity - quantity}},
-                {"$set": {"total_price": find_cart["total_price"] - validate_product["price"] * quantity}},
+                [{"$set": {"total_price": find_cart["total_price"] - validate_product["price"] * quantity}},
                 {"$set": {"total_quantity": find_cart["total_quantity"] - quantity}}]
             )
             return {"message": "Produto removido do carrinho"}

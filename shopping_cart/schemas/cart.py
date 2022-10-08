@@ -1,4 +1,4 @@
-from math import prod
+from decimal import Decimal
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from shopping_cart.schemas.order_item import OrderItemSchema
