@@ -1,3 +1,4 @@
+from gettext import find
 from wsgiref import validate
 from pydantic import EmailStr
 from shopping_cart.schemas.cart import CartSchema, cart_helper
@@ -66,9 +67,17 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
             find_cart = await db.cart_db.find_one({"user.email": email})
             if not find_cart:
                 return {"message": "Usuário não possui um carrinho"}
-            # Valida se o produto existe e se tem a quantidade a ser removida
+            # Valida se o carrinho possui a quantidade a ser removida
+            quantity_req = 0
+            for item in find_cart["order_items"]:
+                if item["product"]["code"] == code:
+                    quantity_req = item["quantity"]
+            if quantity_req < quantity:
+                return {"message": "Quantidade superior à existente no carrinho"}
+            
+            # Valida se o produto existe
             validate_product = await db.product_db.find_one({"code": code})
-            if not validate_product or validate_product.quantity:
+            if not validate_product:
                 return {"message": "O produto não existe"}
             
             order_item = OrderItemSchema()
