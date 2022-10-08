@@ -1,5 +1,5 @@
 from math import prod
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field
 from shopping_cart.schemas.order_item import OrderItemSchema
 from shopping_cart.schemas.user import UserSchema
@@ -7,7 +7,7 @@ from shopping_cart.schemas.user import UserSchema
 
 class CartSchema(BaseModel):
     user: UserSchema
-    order_items: Optional[OrderItemSchema] = []
+    order_items: List[OrderItemSchema] = []
     total_quantity: int = 0
     total_price: float = 0
     paid: bool = Field(default=False)

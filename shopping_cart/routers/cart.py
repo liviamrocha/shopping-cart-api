@@ -15,8 +15,8 @@ async def add_cart(cart: CartSchema):
     return message
 
 @router.post('/item')
-async def add_item(user: UserSchema, order_item: OrderItemSchema):
-    message = await add_product_cart(user, order_item)
+async def add_item(email: EmailStr, code: int, quantity: int):
+    message = await add_product_cart(email, code, quantity)
     return message
 
 @router.get('')
