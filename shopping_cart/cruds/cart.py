@@ -1,10 +1,6 @@
-from genericpath import exists
-from gettext import find
-from wsgiref import validate
 from pydantic import EmailStr
 from shopping_cart.schemas.cart import CartSchema, cart_helper
 from shopping_cart.schemas.order_item import OrderItemSchema
-from shopping_cart.schemas.user import UserSchema
 from shopping_cart.server.database import db
 
 
