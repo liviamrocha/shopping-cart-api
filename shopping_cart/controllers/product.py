@@ -43,12 +43,12 @@ async def search_product_by_name(
     raise_exception: bool = True
 ) -> Optional[dict]:
 
-    product = await product_crud.product_by_name(product_name)
+    products = await product_crud.product_by_name(product_name)
 
-    if not product and raise_exception:
+    if not products and raise_exception:
         raise NotFoundException('Product not found')
 
-    return product
+    return products
 
 
 async def search_product_by_id(

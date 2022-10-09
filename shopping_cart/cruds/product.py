@@ -22,9 +22,13 @@ async def product_by_id(code: int) -> Optional[dict]:
     return product
 
 
-async def product_by_name(name: str) -> Optional[dict]:
-    product = await db.product_db.find_one({"name": name})
-    return product
+async def product_by_name(name: str):
+    product_cursor = db.product_db.find({"name": {'$regex':f'^{name}'}})
+    products = [
+        product
+        async for product in product_cursor
+    ]  
+    return products
     
             
 async def update_product(code: int, product_data: dict) -> bool:

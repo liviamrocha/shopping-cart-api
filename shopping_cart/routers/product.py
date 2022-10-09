@@ -43,7 +43,7 @@ async def get_products() -> List[ProductResponse]:
 
 @router.get(
     '/name', 
-    response_model=ProductResponse,
+    response_model=List[ProductResponse],
     summary="Get product by name",
     description="Search for a product by name",
 )
