@@ -22,9 +22,13 @@ async def product_by_id(code: int) -> Optional[dict]:
     return product
 
 
-async def product_by_name(name: str) -> Optional[dict]:
-    product = await db.product_db.find_one({"name": name})
-    return product
+async def product_by_name(name: str):
+    product_cursor = db.product_db.find({"name": {'$regex':f'^{name}'}})
+    products = [
+        product
+        async for product in product_cursor
+    ]  
+    return products
     
             
 async def update_product(code: int, product_data: dict) -> bool:
@@ -42,3 +46,14 @@ async def remove_product(code: int) -> bool:
     )
     return product.deleted_count > 0
    
+async def update_inventory(product_id: int, quantity: int, increment: bool):
+
+    if not increment:
+        quantity = -quantity
+
+    product = await db.product_db.update_one(
+        {'code': product_id},
+        {'$inc': { "stock": quantity }}
+    )
+
+    return product.modified_count == 1

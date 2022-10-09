@@ -43,12 +43,12 @@ async def search_product_by_name(
     raise_exception: bool = True
 ) -> Optional[dict]:
 
-    product = await product_crud.product_by_name(product_name)
+    products = await product_crud.product_by_name(product_name)
 
-    if not product and raise_exception:
+    if not products and raise_exception:
         raise NotFoundException('Product not found')
 
-    return product
+    return products
 
 
 async def search_product_by_id(
@@ -64,7 +64,7 @@ async def search_product_by_id(
     return product
 
 
-async def update_product_by_id(code: int, product_data: ProductUpdateSchema):
+async def update_product_by_id(code: int, product_data: ProductUpdateSchema) -> ProductResponse:
 
     await search_product_by_id(code)
 
@@ -78,12 +78,16 @@ async def update_product_by_id(code: int, product_data: ProductUpdateSchema):
     if product_data.code is None:
         product_to_update.pop('code', None)
 
-    await product_crud.update_product(
-        code, product_to_update
-    )
-    
+    await product_crud.update_product(code, product_to_update)
+    updated_product = await search_product_by_id(code)
 
-async def delete_product_by_id(code: int) -> bool:
+    return updated_product
+
+async def delete_product_by_id(code: int) -> ProductResponse:
     removed = await product_crud.remove_product(code)
     if not removed:
         raise NotFoundException('Product not found')
+    return "Product successfully deleted"
+
+async def update_product_inventory(product_id: int, quantity: int, increment: bool):
+    await product_crud.update_inventory(product_id, quantity, increment)
