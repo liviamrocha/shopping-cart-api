@@ -7,7 +7,7 @@ class ProductSchema(BaseModel):
     name: str = Field(max_length=100, description="Nome do produto")
     description: str = Field(description="Descrição do produto")
     price: float = Field(gt=0.01, description="Preço do produto")
-    inventory: int = Field(gt=0, description="Quantidade disponível no estoque")
+    stock: int = Field(gt=0, description="Quantidade disponível no estoque")
     inmetro: Optional[str] = Field(description="Código de certificação do brinquedo no INMETRO")
     age_group: Optional[str] = Field(description="Faixa etária recomendada")
     brand: Optional[str] = Field(description="Marca do brinquedo")
@@ -34,7 +34,7 @@ class ProductSchema(BaseModel):
                 "name": "string",
                 "description": "string",
                 "price": 0.01,
-                "inventory": 1,
+                "stock": 1,
                 "inmetro": "string",
                 "age_group": "string",
                 "brand": "string",
@@ -65,7 +65,7 @@ class ProductUpdateSchema(ProductSchema, metaclass=AllOptional):
                 "name": "string",
                 "description": "string",
                 "price": 0.01,
-                "inventory": 1,
+                "stock": 1,
                 "inmetro": "string",
                 "age_group": "string",
                 "brand": "string",
