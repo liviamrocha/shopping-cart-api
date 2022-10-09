@@ -18,20 +18,31 @@ async def create_order(email: EmailStr):
         if not address:
             return {"message": "Usuário não possui endereço de entrega cadastrado"}
         
+        # Encontra o primeiro endereço de entrega cadastrado
+        for item in address["address"]:
+            if item["is_delivery"] == True:
+                delivery_address = item
+                break
         
+        # Troca o carrinho para pago, virando assim um pedido
+        await db.cart_db.find_one_and_update(
+            {"user.email": email},
+            {"$set": {"paid": True}})
         
-        
-        agora_vai = db.cart_db.aggregate([
+        # Copia o pedido para o database order
+        copy_doc = db.cart_db.aggregate([
             {"$match": { "user.email": email}},
-            {"$addFields": {"address": dict(address)}},
+            {"$addFields": {"address": dict(delivery_address)}},
             {"$merge": {"into": "order"}}
         ])
-        agora_vai_lista = await agora_vai.to_list(length=100)
-        print(agora_vai)
-        print(agora_vai_lista)
+        await copy_doc.to_list(length=100)
+        
+        # Deleta o carrinho do database cart
+        await db.cart_db.find_one_and_delete({"user.email": email})
+        
+        # Retorna a mensagem do pedido criado
+        return {"message": "Pedido criado com sucesso"}
             
-        return {"message": "vixi maria"}
-            
-        # Retona a mensagem de erro
+    # Retona a mensagem de erro
     except Exception as e:
             print(f'create_cart.error: {e}')
