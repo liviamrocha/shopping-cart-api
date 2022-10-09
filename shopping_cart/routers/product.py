@@ -43,7 +43,7 @@ async def get_products() -> List[ProductResponse]:
 
 @router.get(
     '/name', 
-    response_model=ProductResponse,
+    response_model=List[ProductResponse],
     summary="Get product by name",
     description="Search for a product by name",
 )
@@ -66,6 +66,7 @@ async def get_product_by_id(id: int):
 @router.put(
     "/{id}",
     status_code=status.HTTP_202_ACCEPTED, 
+    response_model=ProductResponse,
     summary="Update product",
     description="Update product by code",
 ) 
