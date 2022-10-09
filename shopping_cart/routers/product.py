@@ -66,6 +66,7 @@ async def get_product_by_id(id: int):
 @router.put(
     "/{id}",
     status_code=status.HTTP_202_ACCEPTED, 
+    response_model=ProductResponse,
     summary="Update product",
     description="Update product by code",
 ) 
