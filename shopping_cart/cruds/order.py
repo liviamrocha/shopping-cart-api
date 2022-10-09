@@ -4,9 +4,11 @@ from shopping_cart.schemas.order import order_helper, order_helper_list
 from shopping_cart.schemas.order_item import order_item_helper
 from shopping_cart.schemas.product import product_helper
 from shopping_cart.server.database import db
-from bson import ObjectId
 
-
+# Necessário para serializar documentos com ObjectId
+import pydantic
+from bson.objectid import ObjectId
+pydantic.json.ENCODERS_BY_TYPE[ObjectId]=str
 
 
 # Transforma um carrinho em um pedido
@@ -52,16 +54,14 @@ async def create_order(email: EmailStr):
             print(f'create_cart.error: {e}')
 
 
-# Consultar carrinhos fechados por e-mail
-# TODO
+# Consultar carrinhos fechados (pedidos) por e-mail
 async def find_orders(email: EmailStr):
+    # Busca todos os pedidos no database
     orders_cursor = db.order_db.find({"user.email": email})
-    orders_list = []
-    async for item in orders_cursor:
-        orders_list.append(item)
-        print(orders_list)
-    #orders_list = orders.to_list(length=100)
-    return order_helper_list(orders_list)
+    # Transforma o objeto em lista
+    orders_list = await orders_cursor.to_list(length=100)
+    # Order_helper remove do retorno o password e o is_admin
+    return order_helper(orders_list)
 
 
 # Consultar produtos e suas quantidades em pedidos
