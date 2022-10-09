@@ -22,6 +22,6 @@ async def get_products(email: EmailStr):
 
 @router.get('/count')
 async def orders_count(email: EmailStr):
-    message = count_orders(email)
+    message = await count_orders(email)
     return message
 

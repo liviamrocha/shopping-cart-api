@@ -1,8 +1,5 @@
 from pydantic import EmailStr
-from shopping_cart.schemas.cart import cart_helper
-from shopping_cart.schemas.order import order_helper, order_helper_list
-from shopping_cart.schemas.order_item import order_item_helper
-from shopping_cart.schemas.product import product_helper
+from shopping_cart.schemas.order import order_helper
 from shopping_cart.server.database import db
 
 # Necessário para serializar documentos com ObjectId
@@ -96,7 +93,15 @@ async def find_product_quantity(email: EmailStr):
             
 
 # Consultar quantos carrinhos fechados o cliente possui
-# TODO
 async def count_orders(email: EmailStr):
-    orders_count = db.order_db.count_documents({"user.email": email})
-    return {"message": "Total de pedidos: " + orders_count}
+    try:
+        # Valida se o cliente possui um pedido no database
+        find_user = await db.order_db.find_one({"user.email": email})
+        if not find_user:
+            return {"message": "Usuário não encontrado"}
+        # Busca a quantidade de pedidos do usuário
+        orders_count = await db.order_db.count_documents({"user.email": email})
+        return {"message": f"Total de pedidos: {orders_count}"}
+# Retona a mensagem de erro
+    except Exception as e:
+            print(f'count_orders.error: {e}')
