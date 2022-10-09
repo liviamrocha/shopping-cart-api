@@ -95,10 +95,11 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
             if not validate_product:
                 return {"message": "O produto não existe"}
             
-            # Valida se o produto já existe no carrinho e altera a quantidade
+            # Valida se o produto já existe no carrinho
             product_exists = await db.cart_db.find_one({"user.email": email, "order_items.product.code": code})
             if product_exists:
                 for item in product_exists["order_items"]:
+                    # Verifica se o produto existe no carrinho e se a quantidade disponível é maior que a quantidade que deseja remover
                     if item["product"]["code"] == code and item["quantity"] > quantity:
                         index = 0 
                         for item in product_exists["order_items"]:
@@ -108,6 +109,7 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
                                     {"user.email": email, "order_items.product.code": code},
                                     {"$set": {f"order_items.{index}.quantity": new_quantity}})
                             index += 1
+                    # Caso a quantidade que deseja remover seja igual à do carrinho, remove o produto
                     else:        
                         order_item = OrderItemSchema()
                         order_item.product = validate_product
@@ -116,6 +118,7 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
                         await db.cart_db.find_one_and_update(
                             {"user.email": email},
                             {"$pull": {"order_items": order_item.dict()}})
+            # Altera a quantidade total e a soma do carrinho
             else:
                 order_item = OrderItemSchema()
                 order_item.product = validate_product
@@ -125,6 +128,13 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
                 [{"$set": {"total_price": find_cart["total_price"] - validate_product["price"] * quantity}},
                 {"$set": {"total_quantity": find_cart["total_quantity"] - quantity}}]
             )
+            
+            # Verifica se o carrinho está vazio e deleta o carrinho
+            find_product = await db.cart_db.find_one({"user.email": email})
+            if find_product["total_quantity"] == 0:
+                await db.cart_db.find_one_and_delete({"user.email": email})
+                
+            # Retorna a mensagem do produto removido
             return {"message": "Produto removido do carrinho"}
         
         # Retona a mensagem de erro
