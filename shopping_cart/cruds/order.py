@@ -51,30 +51,49 @@ async def create_order(email: EmailStr):
             
     # Retona a mensagem de erro
     except Exception as e:
-            print(f'create_cart.error: {e}')
+            print(f'create_order.error: {e}')
 
 
-# Consultar carrinhos fechados (pedidos) por e-mail
+# Consultar pedidos por e-mail
 async def find_orders(email: EmailStr):
-    # Busca todos os pedidos no database
-    orders_cursor = db.order_db.find({"user.email": email})
-    # Transforma o objeto em lista
-    orders_list = await orders_cursor.to_list(length=100)
-    # Order_helper remove do retorno o password e o is_admin
-    return order_helper(orders_list)
+    try:
+        # Valida se o cliente possui um pedido no database
+        find_user = await db.order_db.find_one({"user.email": email})
+        if not find_user:
+            return {"message": "Usuário não encontrado"}
+        # Busca todos os pedidos no database
+        orders_cursor = db.order_db.find({"user.email": email})
+        # Transforma o objeto em lista
+        orders_list = await orders_cursor.to_list(length=100)
+        # Order_helper remove do retorno o password e o is_admin
+        return order_helper(orders_list)
+# Retona a mensagem de erro
+    except Exception as e:
+            print(f'find_orders.error: {e}')
 
 
 # Consultar produtos e suas quantidades em pedidos
-# TODO
 async def find_product_quantity(email: EmailStr):
-    product_list = []
-    orders = await db.order_db.find({"user.email": email})
-    print(orders)
-    for item in orders["order_item"]:
-        product_list.append(order_item_helper(item))
-        
-    return {"message": "deu"}
-
+    try:
+        # Valida se o cliente possui um pedido no database
+        find_user = await db.order_db.find_one({"user.email": email})
+        if not find_user:
+            return {"message": "Usuário não encontrado"}
+        # Busca todos os pedidos no database
+        orders_cursor = db.order_db.find({"user.email": email})
+        # Transforma o objeto em lista
+        orders_list = await orders_cursor.to_list(length=100)
+        # cria uma lista com produtos e quantidades
+        order_item_list = []
+        for item in orders_list:
+            for order in item["order_items"]:
+                order_item_list.append(order)
+        # Retorna a lista
+        return order_item_list
+# Retona a mensagem de erro
+    except Exception as e:
+            print(f'find_product_quantity.error: {e}')
+            
 
 # Consultar quantos carrinhos fechados o cliente possui
 # TODO
