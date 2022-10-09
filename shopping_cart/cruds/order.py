@@ -1,6 +1,10 @@
 from pydantic import EmailStr
-from shopping_cart.schemas.order import order_helper
+from shopping_cart.schemas.cart import cart_helper
+from shopping_cart.schemas.order import order_helper, order_helper_list
+from shopping_cart.schemas.order_item import order_item_helper
+from shopping_cart.schemas.product import product_helper
 from shopping_cart.server.database import db
+from bson import ObjectId
 
 
 
@@ -46,3 +50,34 @@ async def create_order(email: EmailStr):
     # Retona a mensagem de erro
     except Exception as e:
             print(f'create_cart.error: {e}')
+
+
+# Consultar carrinhos fechados por e-mail
+# TODO
+async def find_orders(email: EmailStr):
+    orders_cursor = db.order_db.find({"user.email": email})
+    orders_list = []
+    async for item in orders_cursor:
+        orders_list.append(item)
+        print(orders_list)
+    #orders_list = orders.to_list(length=100)
+    return order_helper_list(orders_list)
+
+
+# Consultar produtos e suas quantidades em pedidos
+# TODO
+async def find_product_quantity(email: EmailStr):
+    product_list = []
+    orders = await db.order_db.find({"user.email": email})
+    print(orders)
+    for item in orders["order_item"]:
+        product_list.append(order_item_helper(item))
+        
+    return {"message": "deu"}
+
+
+# Consultar quantos carrinhos fechados o cliente possui
+# TODO
+async def count_orders(email: EmailStr):
+    orders_count = db.order_db.count_documents({"user.email": email})
+    return {"message": "Total de pedidos: " + orders_count}

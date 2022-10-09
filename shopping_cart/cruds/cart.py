@@ -1,6 +1,7 @@
+from math import prod
 from pydantic import EmailStr
 from shopping_cart.schemas.cart import CartSchema, cart_helper
-from shopping_cart.schemas.order_item import OrderItemSchema
+from shopping_cart.schemas.order_item import OrderItemSchema, order_item_helper
 from shopping_cart.server.database import db
 
 
@@ -68,7 +69,7 @@ async def add_product_cart(email: EmailStr, code: int, quantity: int):
     except Exception as e:
             print(f'add_product_to_cart.error: {e}')
             
-            
+
 # Remove um produto do carrinho
 async def remove_product_cart(email: EmailStr, code: int, quantity: int):
         try:
@@ -76,6 +77,10 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
             find_cart = await db.cart_db.find_one({"user.email": email})
             if not find_cart:
                 return {"message": "Usuário não possui um carrinho"}
+            if find_cart:
+                product_exists = await db.cart_db.find_one({"user.email": email, "order_items.product.code": code})
+                if not product_exists:
+                    return {"message": "Produto não encontrado"}
             # Valida se o carrinho possui a quantidade a ser removida
             quantity_req = 0
             for item in find_cart["order_items"]:
@@ -84,29 +89,37 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
             if quantity_req < quantity:
                 return {"message": "Quantidade superior à existente no carrinho"}
             
-            # Valida se o produto existe
+        
+            # Valida se o produto existe - necessário para funções de quantidade total e valor total
             validate_product = await db.product_db.find_one({"code": code})
             if not validate_product:
                 return {"message": "O produto não existe"}
+            
             # Valida se o produto já existe no carrinho e altera a quantidade
             product_exists = await db.cart_db.find_one({"user.email": email, "order_items.product.code": code})
             if product_exists:
-                index = 0 
                 for item in product_exists["order_items"]:
-                    if item["product"]["code"] == code:
-                        new_quantity = item["quantity"] - quantity
+                    if item["product"]["code"] == code and item["quantity"] > quantity:
+                        index = 0 
+                        for item in product_exists["order_items"]:
+                            if item["product"]["code"] == code:
+                                new_quantity = item["quantity"] - quantity
+                                await db.cart_db.find_one_and_update(
+                                    {"user.email": email, "order_items.product.code": code},
+                                    {"$set": {f"order_items.{index}.quantity": new_quantity}})
+                            index += 1
+                    else:        
+                        order_item = OrderItemSchema()
+                        order_item.product = validate_product
+                        order_item.quantity = quantity
+                        # Remove o produto do carrinho
                         await db.cart_db.find_one_and_update(
-                            {"user.email": email, "order_items.product.code": code},
-                            {"$set": {f"order_items.{index}.quantity": new_quantity}})
-                    index += 1
+                            {"user.email": email},
+                            {"$pull": {"order_items": order_item.dict()}})
             else:
                 order_item = OrderItemSchema()
                 order_item.product = validate_product
                 order_item.quantity = quantity
-                # Remove o produto do carrinho
-                await db.cart_db.find_one_and_update(
-                    {"user.email": email},
-                    {"$pull": {"order_items": order_item.dict()}})
             await db.cart_db.find_one_and_update(
                 {"user.email": email},
                 [{"$set": {"total_price": find_cart["total_price"] - validate_product["price"] * quantity}},
@@ -116,7 +129,7 @@ async def remove_product_cart(email: EmailStr, code: int, quantity: int):
         
         # Retona a mensagem de erro
         except Exception as e:
-                print(f'add_product_to_cart.error: {e}')
+                print(f'remove_product_from_cart.error: {e}')
                 
 
 # Retorna o carrinho do usuário

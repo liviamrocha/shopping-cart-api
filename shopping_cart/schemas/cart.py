@@ -1,5 +1,4 @@
-from decimal import Decimal
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel, Field
 from shopping_cart.schemas.order_item import OrderItemSchema
 from shopping_cart.schemas.user import UserSchema
@@ -22,11 +21,16 @@ def cart_helper(cart) -> dict:
                 "name": item["product"]["name"],
                 "description": item["product"]["description"],
                 "price": item["product"]["price"],
-                "material": item["product"]["material"],
-                "inmetro": item["product"]["inmetro"],
                 "code": item["product"]["code"],
-                "stock": item["product"]["stock"],
-                "quantity": item["quantity"],
+                "quantity": item["quantity"]
+                # "name": item["product"]["name"],
+                # "description": item["product"]["description"],
+                # "price": item["product"]["price"],
+                # "material": item["product"]["material"],
+                # "inmetro": item["product"]["inmetro"],
+                # "code": item["product"]["code"],
+                # "stock": item["product"]["stock"],
+                # "quantity": item["quantity"],
             }
             products_list.append(product)
         
