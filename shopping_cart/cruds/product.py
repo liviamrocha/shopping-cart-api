@@ -46,3 +46,14 @@ async def remove_product(code: int) -> bool:
     )
     return product.deleted_count > 0
    
+async def update_inventory(product_id: int, quantity: int, increment: bool):
+
+    if not increment:
+        quantity = -quantity
+
+    product = await db.product_db.update_one(
+        {'code': product_id},
+        {'$inc': { "stock": quantity }}
+    )
+
+    return product.modified_count == 1
