@@ -26,7 +26,6 @@ class AddressSchema(BaseModel):
         description="Nome do estado"
     )
     is_delivery: bool = Field(
-        default=True,
         description="Endereço de entrega?"
     )
     complement: Optional[str] = Field(
