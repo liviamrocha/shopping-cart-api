@@ -20,7 +20,7 @@ class ProductSchema(BaseModel):
     cor: Optional[str] = Field(description="Cor do produto")
     topic: Optional[str] = Field(description="Tema do brinquedo")
     cartoon_character: Optional[str] = Field(description="Personagem de desenho animado")
-    best_uses: Optional[str] = Field(description="Melhores usos para o br")
+    best_uses: Optional[str] = Field(description="Melhores usos para o brinquedo")
 
     # Configurações extra para o Swagger
     class Config:
