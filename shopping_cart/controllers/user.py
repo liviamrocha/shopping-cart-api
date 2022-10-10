@@ -9,7 +9,6 @@ from shopping_cart.schemas.user import (
 from shopping_cart.controllers.exceptions.custom_exceptions import (
     AlreadyExistException,
     NotFoundException,
-    DataConflictException
 )
 
 
@@ -30,7 +29,6 @@ async def create_new_user(user: UserSchema) -> UserResponse:
     new_user = user.dict()
     await user_crud.create_user(new_user)
     created_user = UserResponse(**new_user)
-
     return created_user
 
     
@@ -48,7 +46,6 @@ async def search_user_by_email(
 
     if not user and raise_exception:
         raise NotFoundException('User not found')
-
     return user
 
 
@@ -56,13 +53,11 @@ async def update_user_password(email: EmailStr, password_data: PasswordUpdateSch
 
     await search_user_by_email(email)
 
-    if password_data.email is not None and password_data.email != email:
-        raise DataConflictException('The e-mails are different')
-
-    await validate_user(password_data, email)
-
     password_to_update = password_data.dict()
-
     await user_crud.update_password(
         email, password_to_update
     )
+    updated_user = await search_user_by_email(email)
+    return updated_user
+
+

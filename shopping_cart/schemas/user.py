@@ -34,24 +34,14 @@ class UserSchema(BaseModel):
             "example": {
                 "name": "string",
                 "email": "string",
-                "password": "string",
-                "is_active": True,
-                "is_admin": False
+                "password": "string"
             }
         }
 
 class PasswordUpdateSchema(BaseModel):
-    email: EmailStr = Field(
-        unique=True, 
-        index=True,
-        description="E-mail do usuário"
-    )
     new_password: str = Field(
         description="Senha nova"
     )
-    # old_password: str = Field(
-    #     description="Senha antiga"
-    # )
 
 class UserResponse(UserSchema):
     pass
