@@ -20,16 +20,27 @@ async def add_address(email: EmailStr, address: AddressSchema):
     )
     return address
         
-
-async def find_address_by_email(email: EmailStr):
-    address_document = await db.address_db.find_one({"user.email": email})
-    return address_document
-    
-
 async def find_user(email: EmailStr):
     address_document = await db.address_db.find_one({"user.email": email})
     return address_document
 
+async def find_addresses_by_email(email: EmailStr):
+    address_document = await db.address_db.find_one({"user.email": email})
+    return address_document
+
+async def find_address(email: EmailStr, address: AddressSchema):
+    address_document = await db.address_db.find_one(
+        {"email": email, "address": address},
+    )
+    return address_document
+
+
+async def delete_address(email, address: AddressSchema):
+    deleted_adresses = await db.address_db.update_one(
+        {'user.email': email}, 
+        { "$pull": { "address": address } }
+    )
+    return deleted_adresses.modified_count > 0
 
 async def update_delivered_address(email: EmailStr):
     updated_adresses = await db.address_db.find_one_and_update(
@@ -38,3 +49,8 @@ async def update_delivered_address(email: EmailStr):
     )
     return updated_adresses
 
+async def update_delivered_automatically(email: EmailStr):
+    await db.address_db.find_one_and_update(
+        {"user.email": email},
+        {"$set" : {"address.0.is_delivery" : True}}
+    )
