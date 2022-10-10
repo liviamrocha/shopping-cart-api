@@ -4,6 +4,7 @@ import shopping_cart.cruds.address as address_crud
 from shopping_cart.controllers.user import search_user_by_email
 from shopping_cart.schemas.address import (
     AddressSchema, 
+    AddressUpdateSchema
 )
 from shopping_cart.controllers.exceptions.custom_exceptions import (
     AlreadyExistException,
@@ -11,6 +12,20 @@ from shopping_cart.controllers.exceptions.custom_exceptions import (
     DataConflictException
 )
 
+async def validate_address(email: EmailStr, address: AddressSchema, raise_exception=False):
+
+    await search_user_by_email(email)
+
+    user_exist = await address_crud.find_user(email)
+    if not user_exist:
+        raise NotFoundException('User has no registered addresses')
+
+    input_address = await address_crud.find_address(email, address.dict())
+
+    if input_address is not None and raise_exception:
+        raise AlreadyExistException("Address already exists for this user")
+
+    return input_address
 
 async def add_new_address(email: EmailStr, address=AddressSchema):
 
@@ -37,14 +52,30 @@ async def add_new_address(email: EmailStr, address=AddressSchema):
 
 async def find_addresses_by_email(
     email: EmailStr, 
-    raise_exception: bool = False
+    raise_exception: bool = True
 ) -> Optional[dict]:
 
     await search_user_by_email(email)
 
-    address = await address_crud.find_address_by_email(email)
-    if not address:
-        raise NotFoundException('User has no registered address')
-
+    address = await address_crud.find_addresses_by_email(email)
+    if not address and raise_exception:
+        raise NotFoundException('User has no registered addresses')
     return address['address']
 
+
+
+async def delete_address(email: EmailStr, address: AddressSchema):
+
+    await validate_address(email, address)
+
+    removed = await address_crud.delete_address(email, address.dict())
+    if not removed:
+        raise NotFoundException('Address provided is not registered for this user')
+
+    if address.is_delivery:
+        await address_crud.update_delivered_automatically(email)
+
+    return "Address successfully deleted"
+
+
+    
