@@ -1,20 +1,35 @@
-from fastapi import APIRouter
+from typing import List
+from fastapi import APIRouter, status
 from pydantic.networks import EmailStr
-from shopping_cart.cruds.user import create_address, find_address_by_email
-from shopping_cart.schemas.address import Address
+from shopping_cart.controllers.address import (
+    find_addresses_by_email,
+    add_new_address
+)
+from shopping_cart.schemas.address import AddressSchema, AdressUpdateSchema
 from shopping_cart.schemas.user import UserSchema
 
-router = APIRouter(tags=['Address'], prefix='/adresses')
+router = APIRouter(tags=['Address'], prefix='/addresses')
 
 
-# Criar um endereço
-@router.post('')
-async def create_address_user(user: UserSchema, address: Address):
-    data = await create_address(user, address)
-    return data
+@router.post(
+    '/', 
+    summary="Add new address",
+    description="Register new user address",
+    status_code=status.HTTP_201_CREATED,
+    response_model=AddressSchema
+)
+async def create_address_user(email: EmailStr, address: AddressSchema):
+    added_address = await add_new_address(email, address)
+    return added_address
 
-# Buscar um endereço pelo e-mail
-@router.get('')
+
+@router.get(
+    '/', 
+    summary="Get user addresses",
+    description="Returns all registered user addresses",
+    status_code=status.HTTP_200_OK,
+    response_model=List[AddressSchema]
+)
 async def get_address(email: EmailStr):
-    user = await find_address_by_email(email)
+    user = await find_addresses_by_email(email)
     return user
