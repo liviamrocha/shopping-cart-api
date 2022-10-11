@@ -6,11 +6,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from shopping_cart.controllers.user import UserService
 from shopping_cart.schemas.auth_schema import TokenPayload
-
-
 from shopping_cart.schemas.user import UserSchema
 from shopping_cart.auth.auth_handler import settings
-from shopping_cart.cruds.user import get_user_by_email
 
 
 reusable_oauth = OAuth2PasswordBearer(
@@ -21,8 +18,8 @@ reusable_oauth = OAuth2PasswordBearer(
 
 async def get_current_user(token: str = Depends(reusable_oauth)) -> UserSchema:
     try:
-        payload = jwt.encode(
-            token, settings.JWT_SECRET_KEY, algorithm=[settings.JWT_ALGORITHM]
+        payload = jwt.decode(
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )
         token_data = TokenPayload(**payload)
         
