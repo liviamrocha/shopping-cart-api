@@ -10,7 +10,7 @@ from shopping_cart.controllers.exceptions.custom_exceptions import (
     AlreadyExistException,
     NotFoundException,
 )
-from shopping_cart.core.security import get_password
+from shopping_cart.core.security import get_password, verify_password
 
 from shopping_cart.server.database import db
 
@@ -26,6 +26,21 @@ class UserService:
         if user:
             await db.user_db.insert_one(user_in.dict())
             return user_in
+        
+    @staticmethod
+    async def authenticate(email: str, password: str):
+        user = await search_user_by_email(email)
+        if user:
+            if not verify_password(password=password, hashed_password=user["password"]):
+                return None
+            return user
+        
+    @staticmethod
+    async def get_user_by_email(email: str) -> Optional[UserSchema]:
+        user = await db.user_db.find_one({"email": email})
+        return user
+                
+            
 
 
 async def validate_user(user: UserSchema, input_code: Optional[str] = None):
