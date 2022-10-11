@@ -45,4 +45,17 @@ class PasswordUpdateSchema(BaseModel):
 
 class UserResponse(UserSchema):
     pass
-
+    
+class UserLoginSchema(BaseModel):
+    name: str
+    email: EmailStr = Field(...)
+    password: str = Field(...)
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "String",
+                "email": "user@user.com",
+                "password": "string"
+            }
+        }

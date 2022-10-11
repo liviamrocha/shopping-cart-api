@@ -1,12 +1,11 @@
 from typing import List, Optional
 from pydantic import EmailStr
 from shopping_cart.server.database import db
-from shopping_cart.schemas.user import UserSchema
 
 
-async def create_user(user: UserSchema) -> dict:
-    new_user = await db.user_db.insert_one(user)
-    return new_user
+# async def create_user(user: UserSchema) -> dict:
+#     new_user = await db.user_db.insert_one(user)
+#     return new_user
 
 
 async def get_all_users() -> List[dict]:

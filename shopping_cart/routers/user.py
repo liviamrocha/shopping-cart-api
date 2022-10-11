@@ -1,20 +1,34 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Body
 from typing import List
 from pydantic.networks import EmailStr
 from shopping_cart.schemas.user import (
     PasswordUpdateSchema, 
-    UserSchema, 
+    UserSchema,
     UserResponse
 )
 from shopping_cart.controllers.user import (
+    UserService,
     create_new_user,
     get_all_users,
     search_user_by_email,
-    update_user_password
+    update_user_password,
 )
+from shopping_cart.auth.auth_handler import signJWT
 
 
 router = APIRouter(tags=['User'], prefix='/user')
+
+
+
+@router.post(
+    '/login'
+)
+
+
+
+
+
+
 
 @router.post(
     '/', 
@@ -24,7 +38,7 @@ router = APIRouter(tags=['User'], prefix='/user')
     response_model=UserSchema
 )
 async def post_user(user: UserSchema):
-    new_user = await create_new_user(user)
+    new_user = await UserService.create_user_security(user)
     return new_user
 
 

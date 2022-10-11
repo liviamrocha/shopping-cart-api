@@ -2,14 +2,30 @@ from typing import List, Optional
 from pydantic.networks import EmailStr
 import shopping_cart.cruds.user as user_crud
 from shopping_cart.schemas.user import (
-    UserSchema, 
-    PasswordUpdateSchema, 
-    UserResponse
+    PasswordUpdateSchema,
+    UserResponse,
+    UserSchema
 )
 from shopping_cart.controllers.exceptions.custom_exceptions import (
     AlreadyExistException,
     NotFoundException,
 )
+from shopping_cart.core.security import get_password
+
+from shopping_cart.server.database import db
+
+class UserService:
+    @staticmethod
+    async def create_user_security(user: UserSchema):
+        user_in = UserSchema(
+            name=user.name,
+            email=user.email,
+            password=get_password(user.password)
+        )
+        await validate_user(user)
+        if user:
+            await db.user_db.insert_one(user_in.dict())
+            return user_in
 
 
 async def validate_user(user: UserSchema, input_code: Optional[str] = None):
