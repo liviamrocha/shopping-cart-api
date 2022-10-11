@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 class TokenSchema(BaseModel):
     access_token: str
@@ -6,5 +6,5 @@ class TokenSchema(BaseModel):
     
     
 class TokenPayload(BaseModel):
-    sub: EmailStr = None
+    sub: str = None
     exp: int = None

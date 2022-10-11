@@ -1,9 +1,7 @@
-import time
-from typing import Dict
-
-import jwt
 from decouple import config
 from pydantic import BaseSettings
+
+from shopping_cart.core import settings
 
 class Settings(BaseSettings):
     JWT_SECRET_KEY = config("secret")
@@ -15,28 +13,28 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = True
 
-settings = Settings()
+settings_auth = Settings()
 
 
-def token_response(token: str):
-    return {
-        "access_token": token
-    }
+# def token_response(token: str):
+#     return {
+#         "access_token": token
+#     }
     
     
-def signJWT(email: str) -> Dict[str, str]:
-    payload = {
-        "email": email,
-        "expires": time.time() + 600
-    }
-    token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+# def signJWT(email: str) -> Dict[str, str]:
+#     payload = {
+#         "email": email,
+#         "expires": time.time() + 600
+#     }
+#     token = jwt.encode(payload, settings_auth.JWT_SECRET_KEY, algorithm=settings_auth.JWT_ALGORITHM)
 
-    return token_response(token)
+#     return token_response(token)
 
 
-def decodeJWT(token: str) -> dict:
-    try:
-        decoded_token = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        return decoded_token if decoded_token["expires"] >= time.time() else None
-    except:
-        return {}
+# def decodeJWT(token: str) -> dict:
+#     try:
+#         decoded_token = jwt.decode(token, settings_auth.JWT_SECRET_KEY, algorithms=[settings_auth.JWT_ALGORITHM])
+#         return decoded_token if decoded_token["expires"] >= time.time() else None
+#     except:
+#         return {}

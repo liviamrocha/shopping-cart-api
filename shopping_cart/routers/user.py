@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Body, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Any, List
+import jwt
+from pydantic import ValidationError
 from pydantic.networks import EmailStr
 from shopping_cart.dependencies.user_deps import get_current_user
 from shopping_cart.core.security import create_access_token, create_refresh_token
-from shopping_cart.schemas.auth_schema import TokenSchema
+from shopping_cart.core.security import create_access_token, create_refresh_token, settings_auth
+from shopping_cart.schemas.auth_schema import TokenPayload, TokenSchema
 from shopping_cart.schemas.user import (
     PasswordUpdateSchema, 
     UserSchema,
@@ -17,12 +20,11 @@ from shopping_cart.controllers.user import (
     search_user_by_email,
     update_user_password,
 )
-from shopping_cart.auth.auth_handler import signJWT
 from shopping_cart.controllers.user import UserService
 
 
-router = APIRouter(tags=['User'], prefix='/user')
 
+router = APIRouter(tags=['User'], prefix='/user')
 
 
 @router.post(
@@ -44,7 +46,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
         "refresh_token": create_refresh_token(user["email"])
     }
     
-@router.post('test-token', 
+
+@router.post('/test-token', 
              summary="Test if the access token is valid", 
              response_model=UserSchema
 )
@@ -52,8 +55,36 @@ async def test_token(user: UserSchema = Depends(get_current_user)):
     return user
 
 
+@router.post('/refresh',
+             summary="Refresh token",
+             response_model=TokenSchema)
+async def refresh_token(refresh_token: str = Body(...)):
+    try:
+        payload = jwt.decode(
+            refresh_token, settings_auth.JWT_REFRESH_SECRET_KEY, algorithms=[settings_auth.JWT_ALGORITHM]
+        )
+        token_data = TokenPayload(**payload)
 
-
+    except(jwt.JWTError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+        
+    user = await UserService.get_user_by_email(token_data.sub)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    
+    return{
+    "access_token": create_access_token(user["email"]),
+    "refresh_token": create_refresh_token(user["email"])
+}
+        
 
 
 @router.post(
