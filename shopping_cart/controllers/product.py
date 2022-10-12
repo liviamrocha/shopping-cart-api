@@ -89,5 +89,6 @@ async def delete_product_by_id(code: int) -> ProductResponse:
         raise NotFoundException('Product not found')
     return "Product successfully deleted"
 
-async def update_product_inventory(product_id: int, quantity: int, increment: bool):
-    await product_crud.update_inventory(product_id, quantity, increment)
+async def update_product_inventory(order):
+    for item in order['items']:
+        await product_crud.update_inventory(item['product']['code'], item["quantity"])

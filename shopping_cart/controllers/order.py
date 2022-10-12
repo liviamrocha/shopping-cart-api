@@ -4,18 +4,10 @@ from pydantic import EmailStr
 import shopping_cart.cruds.order as order_crud
 from bson.binary import UuidRepresentation
 from shopping_cart.schemas.user import UserSchema
-from shopping_cart.schemas.order import (
-    OrderResponseSchema
-)
-from shopping_cart.controllers.exceptions.custom_exceptions import (
-    AlreadyExistException,
-    NotFoundException,
-    DataConflictException,
-    NotAvailableException,
-    NotValidException
-)
+from shopping_cart.schemas.order import OrderResponseSchema
+from shopping_cart.controllers.exceptions.custom_exceptions import NotFoundException
 from shopping_cart.controllers.cart import has_cart, clean_user_cart
-from shopping_cart.controllers.product import search_product_by_id
+from shopping_cart.controllers.product import update_product_inventory
 from shopping_cart.controllers.user import search_user_by_email
 from shopping_cart.controllers.address import find_delivery_address
 
@@ -35,6 +27,8 @@ async def create_order(email: EmailStr):
     await update_payment_status(email)
     await order_crud.create_order(email, delivery_address, order_id)
     await clean_user_cart(email)
+    await update_product_stock(order_id)
+
 
     return {"order_id": order_id}
 
@@ -74,6 +68,10 @@ async def find_total_orders(email: EmailStr):
 # Funções auxiliares
 async def update_payment_status(email: EmailStr):
     return await order_crud.update_payment_status(email)
+
+async def update_product_stock(order_id):
+    order = await find_order_by_id(order_id)
+    await update_product_inventory(order)
 
 async def find_user(email: EmailStr):
     find_user_order = await order_crud.find_user_order(email)
