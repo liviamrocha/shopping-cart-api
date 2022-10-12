@@ -14,3 +14,12 @@ class NotFoundException(ControllerException):
 class DataConflictException(ControllerException):
     def __init__(self, message: str) -> None:
         super(DataConflictException, self).__init__(message)
+
+class NotAvailableException(ControllerException):
+    def __init__(self, message: str) -> None:
+        super(NotAvailableException, self).__init__(message)
+
+class NotValidException(ControllerException):
+    def __init__(self, message: str) -> None:
+        super(NotValidException, self).__init__(message)
+        

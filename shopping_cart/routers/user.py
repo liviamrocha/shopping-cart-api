@@ -18,6 +18,7 @@ from shopping_cart.controllers.user import (
     get_all_users,
     search_user_by_email,
     update_user_password,
+    delete_user
 )
 from shopping_cart.controllers.user import UserService
 
@@ -130,3 +131,14 @@ async def get_user_by_email(email: EmailStr, current_user: UserSchema = Depends(
 async def password_update(email: EmailStr, password_data: PasswordUpdateSchema, current_user: UserSchema = Depends(get_current_user)):
     updated_user =  await update_user_password(email, password_data)
     return updated_user
+
+
+@router.delete(
+    '/', 
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Delete user",
+    description="Delete user by e-mail",
+)
+async def delete_user_by_email(email: EmailStr):
+    user = await delete_user(email)
+    return user

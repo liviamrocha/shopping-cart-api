@@ -1,4 +1,5 @@
 from typing import List, Optional
+from datetime import datetime
 from bson import ObjectId
 from shopping_cart.server.database import db
 
@@ -33,6 +34,8 @@ async def product_by_name(name: str):
             
 async def update_product(code: int, product_data: dict) -> bool:
     data = {key: value for key, value in dict(product_data).items() if value is not None}
+    data['updated_at'] = datetime.now()
+
     product = await db.product_db.update_one(
         {'code': code},
         {'$set': data}
@@ -45,15 +48,19 @@ async def remove_product(code: int) -> bool:
         {'code': code}
     )
     return product.deleted_count > 0
+    
    
-async def update_inventory(product_id: int, quantity: int, increment: bool):
+async def update_inventory(product_id: int, quantity: int):
 
-    if not increment:
-        quantity = -quantity
+    current_product = await product_by_id(product_id)
+    current_stock = current_product['stock']
+    new_stock = current_stock - quantity
+
+    if new_stock < 0:
+        new_stock = 0
 
     product = await db.product_db.update_one(
-        {'code': product_id},
-        {'$inc': { "stock": quantity }}
+        {"code": product_id},
+        {"$set": {"stock": new_stock, "updated_at": datetime.now()}}
     )
-
     return product.modified_count == 1
