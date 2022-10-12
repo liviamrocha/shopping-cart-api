@@ -62,6 +62,15 @@ async def find_addresses_by_email(
         raise NotFoundException('User has no registered addresses')
     return address['address']
 
+async def find_delivery_address(email: EmailStr):
+
+    await search_user_by_email(email)
+    await find_addresses_by_email(email)
+
+    delivery_address = await address_crud.get_delivery_address(email)
+    if not delivery_address:
+        raise NotFoundException('User has no registered addresses')
+    return delivery_address
 
 
 async def delete_address(email: EmailStr, address: AddressSchema):

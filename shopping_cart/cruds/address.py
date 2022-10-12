@@ -34,6 +34,16 @@ async def find_address(email: EmailStr, address: AddressSchema):
     )
     return address_document
 
+async def get_delivery_address(email: EmailStr):
+    address = await db.address_db.find_one(
+        {"user.email": email, 
+        "address.is_delivery": True}
+    )
+    for item in address["address"]:
+            if item["is_delivery"] == True:
+                delivery_address = item
+                break
+    return delivery_address
 
 async def delete_address(email, address: AddressSchema):
     deleted_adresses = await db.address_db.update_one(
