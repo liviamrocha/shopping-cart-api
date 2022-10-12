@@ -1,4 +1,5 @@
 from typing import List, Optional
+from fastapi import HTTPException, status
 from pydantic.networks import EmailStr
 import shopping_cart.cruds.user as user_crud
 from shopping_cart.schemas.user import (
@@ -82,13 +83,19 @@ async def search_user_by_email(
 
 async def update_user_password(email: EmailStr, password_data: PasswordUpdateSchema):
 
-    await search_user_by_email(email)
+    user = await search_user_by_email(email)
+    
+    if verify_password(password_data.current_password, user["password"]):
+    
+        new_pass = get_password(password_data.new_password)
 
-    password_to_update = password_data.dict()
-    await user_crud.update_password(
-        email, password_to_update
-    )
-    updated_user = await search_user_by_email(email)
-    return updated_user
+        await user_crud.update_password(
+            email, new_pass
+        )
+        updated_user = await search_user_by_email(email)
+        return updated_user
+    raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect password")
 
 

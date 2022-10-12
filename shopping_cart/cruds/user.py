@@ -22,10 +22,10 @@ async def get_user_by_email(email: EmailStr) -> Optional[dict]:
     return user
 
 
-async def update_password(email: EmailStr, password_data: dict) -> bool:
+async def update_password(email: EmailStr, new_pass: str) -> bool:
     user = await db.user_db.update_one(
         {'email': email},
-        {'$set': {'password': password_data['new_password']}}
+        {'$set': {'password': new_pass}}
     )
     return user.modified_count == 1
     

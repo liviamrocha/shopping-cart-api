@@ -3,7 +3,6 @@ from pydantic import ValidationError
 from fastapi import HTTPException, status
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
-# from jose import jwt, JWTError
 from shopping_cart.controllers.user import UserService
 from shopping_cart.schemas.auth_schema import TokenPayload
 from shopping_cart.schemas.user import UserSchema

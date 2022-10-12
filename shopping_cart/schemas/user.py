@@ -39,6 +39,9 @@ class UserSchema(BaseModel):
         }
 
 class PasswordUpdateSchema(BaseModel):
+    current_password: str = Field(
+        description="Senha atual"
+    )
     new_password: str = Field(
         description="Senha nova"
     )

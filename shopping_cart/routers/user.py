@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Body, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Any, List
-from jose import JWTError
 import jwt
 from pydantic import ValidationError
 from pydantic.networks import EmailStr
