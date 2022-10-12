@@ -40,9 +40,7 @@ class UserService:
     @staticmethod
     async def get_user_by_email(email: str) -> Optional[UserSchema]:
         user = await db.user_db.find_one({"email": email})
-        return user
-                
-            
+        return user        
 
 
 async def validate_user(user: UserSchema, input_code: Optional[str] = None):

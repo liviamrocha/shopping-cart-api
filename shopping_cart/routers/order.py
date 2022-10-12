@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
 from pydantic import EmailStr
 from shopping_cart.schemas.order import OrderResponseSchema
 from shopping_cart.schemas.order_items import OrderItemSchema
@@ -10,6 +10,8 @@ from shopping_cart.controllers.order import (
     find_order_items,
     find_total_orders
 )
+from shopping_cart.dependencies.user_deps import get_current_user
+from shopping_cart.schemas.user import UserSchema
 
 router = APIRouter(tags=['Orders'], prefix='/orders')
 
@@ -19,7 +21,7 @@ router = APIRouter(tags=['Orders'], prefix='/orders')
     description="Close the user's shopping cart and create an order",
     status_code=status.HTTP_201_CREATED,
 )
-async def add_order(email: EmailStr):
+async def add_order(email: EmailStr, current_user: UserSchema = Depends(get_current_user)):
     order_id = await create_order(email)
     return order_id
 
@@ -30,7 +32,7 @@ async def add_order(email: EmailStr):
     summary="Get closed orders",
     description="Search for all closed user orders",
 )
-async def get_orders(email: EmailStr):
+async def get_orders(email: EmailStr, current_user: UserSchema = Depends(get_current_user)):
     orders = await find_user_orders(email)
     return orders
 
@@ -41,7 +43,7 @@ async def get_orders(email: EmailStr):
     summary="Get closed order by id.",
     description="Search for a closed order by id",
 )
-async def get_order(order_id: str):
+async def get_order(order_id: str, current_user: UserSchema = Depends(get_current_user)):
     order = await find_order_by_id(order_id)
     return order
 
@@ -52,7 +54,7 @@ async def get_order(order_id: str):
     summary="Get closed order by id.",
     description="Search for a closed order by id"
 )
-async def get_items(email: EmailStr, order_id: str):
+async def get_items(email: EmailStr, order_id: str, current_user: UserSchema = Depends(get_current_user)):
     items = await find_order_items(email, order_id)
     return items
 
@@ -62,7 +64,7 @@ async def get_items(email: EmailStr, order_id: str):
     summary="Get total orders",
     description="Return total of user orders",
 )
-async def orders_count(email: EmailStr):
+async def orders_count(email: EmailStr, current_user: UserSchema = Depends(get_current_user)):
     total_orders = await find_total_orders(email)
     return total_orders
 

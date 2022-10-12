@@ -11,7 +11,7 @@ from jose import JWTError, jwt
 
 
 reusable_oauth = OAuth2PasswordBearer(
-    tokenUrl="/user/login",
+    tokenUrl="/auth/login",
     scheme_name="JWT"
 )
 

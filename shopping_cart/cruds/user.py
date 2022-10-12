@@ -5,10 +5,6 @@ from shopping_cart.server.database import db
 from shopping_cart.schemas.user import UserSchema
 
 
-# async def create_user(user: UserSchema) -> dict:
-#     new_user = await db.user_db.insert_one(user)
-#     return new_user
-
 
 async def get_all_users() -> List[dict]:
     users_cursor = db.user_db.find()
@@ -30,6 +26,7 @@ async def update_password(email: EmailStr, new_pass: str) -> bool:
         {'$set': {'password': new_pass, 'updated_at': datetime.now()}}
     )
     return user.modified_count == 1
+    
 
 async def delete_user(email: EmailStr) -> bool:
     user = await db.user_db.delete_one(
