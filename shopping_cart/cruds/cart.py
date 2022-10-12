@@ -1,4 +1,5 @@
 from pydantic import EmailStr
+from datetime import datetime
 from shopping_cart.schemas.user import UserSchema
 from shopping_cart.schemas.cart import CartSchema
 from shopping_cart.server.database import db
@@ -15,28 +16,28 @@ async def create_cart(user: UserSchema):
 async def add_to_cart(email: EmailStr, cart_item: dict):
     added_item = await db.cart_db.find_one_and_update(
         {"user.email": email},
-        {"$addToSet": {"order_items": cart_item}}
+        {"$addToSet": {"items": cart_item}},
+        
     )
     return added_item
 
-
 # Deleta item do carrinho
 async def delete_cart_item(email: EmailStr, product_code: int):
-    deleted_item = await db.cart_db.find_one_and_update(
+    return await db.cart_db.find_one_and_update(
         {"user.email": email},
-        {"$pull": {"order_items": {"product.code": product_code}}}
+        {"$pull": {"items": {"product.code": product_code}}}
     )
 
 # Checa se o item já existe dentro do carrinho
 async def check_cart_item(email, product_id):
     cart_document = await db.cart_db.find_one(
-        {"user.email": email, "order_items.product.code": product_id}
+        {"user.email": email, "items.product.code": product_id},
     )
     return cart_document
 
-# Deleta (limpa) carriho
+# Deleta (limpa) carrinho
 async def delete_cart(email: EmailStr):
-    deleted_cart = await db.cart_db.find_one_and_delete({"user.email": email})
+    return await db.cart_db.find_one_and_delete({"user.email": email})
 
 # Atualiza quantidade de um item no carrinho
 async def update_item_quantity(
@@ -47,8 +48,8 @@ async def update_item_quantity(
 ) -> bool:
 
     updated_cart = await db.cart_db.find_one_and_update(
-        {"user.email": email, "order_items.product.code": product_id},
-        {"$set": {f"order_items.{index}.quantity": new_quantity}}
+        {"user.email": email, "items.product.code": product_id},
+        {"$set": {f"items.{index}.quantity": new_quantity, "updated_at": datetime.now()}}
     )
     return updated_cart  
             
@@ -57,7 +58,7 @@ async def update_item_quantity(
 async def update_total_price(email: EmailStr, new_total_price: float):
     cart = await db.cart_db.find_one_and_update(
         {"user.email": email},
-        {"$set": {"total_price": new_total_price}}
+        {"$set": {"total_price": new_total_price, "updated_at": datetime.now()}}
     )
     return cart
 
@@ -65,7 +66,7 @@ async def update_total_price(email: EmailStr, new_total_price: float):
 async def update_total_quantity(email: EmailStr, new_total_quantity: int):
     cart = await db.cart_db.find_one_and_update(
         {"user.email": email},
-        {"$set": {"total_quantity": new_total_quantity}}
+        {"$set": {"total_quantity": new_total_quantity, "updated_at": datetime.now()}}
     )
     return cart
                 

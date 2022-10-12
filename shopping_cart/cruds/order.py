@@ -1,5 +1,6 @@
 import uuid
 from pydantic import EmailStr
+from datetime import datetime
 from bson.binary import UuidRepresentation
 from shopping_cart.server.database import db
 
@@ -14,7 +15,9 @@ async def create_order(email: EmailStr, delivery_address: dict, order_id: str):
         {"$match": { "user.email": email}},
         {"$addFields": {
             "address": delivery_address, 
-            "order_id": order_id
+            "order_id": order_id,
+            "created_at": datetime.now() ,
+            "updated_at": datetime.now()
         }},
         {"$merge": {"into": "order"}}
     ])
@@ -23,7 +26,7 @@ async def create_order(email: EmailStr, delivery_address: dict, order_id: str):
 async def update_payment_status(email: EmailStr):
     updated_status = await db.cart_db.find_one_and_update(
         {"user.email": email},
-        {"$set": {"paid": True}}
+        {"$set": {"paid": True, "updated_at": datetime.now()}}
     )
     return updated_status
 
@@ -55,7 +58,7 @@ async def get_itens_from_order(email: EmailStr, order_id: str):
     orders_list = await orders_cursor.to_list(length=100)
     order_item_list = []
     for item in orders_list:
-        for order in item["order_items"]:
+        for order in item["items"]:
             order_item_list.append(order)
     return order_item_list
 
@@ -65,9 +68,8 @@ async def get_orders_count(email: EmailStr):
     orders_count = await db.order_db.count_documents({"user.email": email})
     return orders_count
 
-# Checa se um usuário pertence uma determinada order
+# Checa se existe uma order específica associada ao usuário
 async def validade_order_for_user(email: EmailStr, order_id: str):
-    # Busca a quantidade de pedidos do usuário
     find_user_order = await db.order_db.find_one({
         "user.email": email,
         "order_id": order_id
