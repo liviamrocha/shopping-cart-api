@@ -1,4 +1,5 @@
-from typing import List
+from datetime import datetime
+from typing import List, Optional
 from pydantic import BaseModel, Field
 from uuid import UUID, uuid4
 from shopping_cart.schemas.address import AddressSchema
@@ -14,14 +15,16 @@ class OrderSchema(BaseModel):
     address: AddressSchema
 
 class OrderItemSchema(BaseModel):
-    product: ProductSchema
-    quantity: int
+    product: ProductSchema 
+    quantity: int 
     
 class OrderResponseSchema(BaseModel):
     order_id: str = Field(description="Número do pedido")
     address: AddressSchema = Field(description="Endereço de entrega")
     paid: bool = Field(description="Pedido pago?")
-    total_price: float = Field("Valor total do pedido")
-    total_quantity: int = Field("Quantidade de produtos")
-    order_items: List[OrderItemSchema] = Field("Itens do pedido")
+    total_price: float = Field(description="Valor total do pedido")
+    total_quantity: int = Field(description="Quantidade de produtos")
+    items: List[OrderItemSchema] = Field(description="Itens do pedido")
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
     

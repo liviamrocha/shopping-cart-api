@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 from typing import Optional
 from shopping_cart.schemas.utils import AllOptional
 
@@ -21,6 +22,14 @@ class ProductSchema(BaseModel):
     topic: Optional[str] = Field(description="Tema do brinquedo")
     cartoon_character: Optional[str] = Field(description="Personagem de desenho animado")
     best_uses: Optional[str] = Field(description="Melhores usos para o brinquedo")
+    created_at: datetime = Field(
+        default=datetime.now(),
+        description="Data/hora de criação do produto"
+    )
+    updated_at: datetime = Field(
+        default=datetime.now(),
+        description="Data/hora da última atualização"
+    )
 
     # Configurações extra para o Swagger
     class Config:

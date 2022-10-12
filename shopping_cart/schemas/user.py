@@ -28,6 +28,10 @@ class UserSchema(BaseModel):
         default=datetime.now(),
         description="Data/hora de criação do usuário"
     )
+    updated_at: datetime = Field(
+        default=datetime.now(),
+        description="Data/hora da última atualização"
+    )
 
     class Config:
         schema_extra = {
