@@ -28,6 +28,10 @@ class UserSchema(BaseModel):
         default=datetime.now(),
         description="Data/hora de criação do usuário"
     )
+    updated_at: datetime = Field(
+        default=datetime.now(),
+        description="Data/hora da última atualização"
+    )
 
     class Config:
         schema_extra = {
@@ -39,6 +43,9 @@ class UserSchema(BaseModel):
         }
 
 class PasswordUpdateSchema(BaseModel):
+    current_password: str = Field(
+        description="Senha atual"
+    )
     new_password: str = Field(
         description="Senha nova"
     )

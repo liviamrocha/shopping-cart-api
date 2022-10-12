@@ -1,6 +1,7 @@
 from typing import List, Optional
 from pydantic.networks import EmailStr
 import shopping_cart.cruds.user as user_crud
+from shopping_cart.cruds.cart import delete_cart, get_user_cart
 from shopping_cart.schemas.user import (
     UserSchema, 
     PasswordUpdateSchema, 
@@ -59,5 +60,18 @@ async def update_user_password(email: EmailStr, password_data: PasswordUpdateSch
     )
     updated_user = await search_user_by_email(email)
     return updated_user
+
+async def delete_user(email: EmailStr):
+
+    await search_user_by_email(email)
+
+    cart = await get_user_cart(email)
+    if cart:
+        await delete_cart(email)
+
+    await user_crud.delete_user(email)
+    return {"message": "User has been successfully deleted"}
+
+
 
 

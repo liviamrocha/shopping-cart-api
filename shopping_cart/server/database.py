@@ -13,6 +13,7 @@ class Database():
     address_db = None
     order_db = None
     order_item_db = None
+    cart_db = None
     
     
 db = Database()
@@ -28,6 +29,7 @@ async def connect_db():
     db.address_db = db.client.shopping_cart.address
     db.order_db = db.client.shopping_cart.order
     db.order_item_db = db.client.shopping_cart.order_item
+    db.cart_db = db.client.shopping_cart.cart
     
     logging.info('Connect to database')
     

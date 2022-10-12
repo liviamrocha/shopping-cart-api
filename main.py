@@ -7,7 +7,8 @@ from shopping_cart.controllers.exceptions.custom_exceptions import (
     AlreadyExistException,
     NotFoundException,
     DataConflictException,
-
+    NotAvailableException,
+    NotValidException
 )
 
 env = get_environment_variables()
@@ -40,6 +41,20 @@ async def not_found_handler(request: Request, exc: NotFoundException):
 
 @app.exception_handler(DataConflictException)
 async def data_conflict_handler(request: Request, exc: DataConflictException):
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={"message": exc.message},
+    )
+
+@app.exception_handler(NotAvailableException)
+async def not_available_handler(request: Request, exc: NotAvailableException):
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={"message": exc.message},
+    )
+
+@app.exception_handler(NotValidException)
+async def not_available_handler(request: Request, exc: NotValidException):
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
         content={"message": exc.message},
