@@ -2,6 +2,8 @@ from typing import List
 from pydantic import BaseModel, Field
 from shopping_cart.schemas.order_item import OrderItemSchema
 from shopping_cart.schemas.user import UserSchema
+from shopping_cart.schemas.product import ProductSchema
+
 
 
 class CartSchema(BaseModel):
@@ -10,7 +12,13 @@ class CartSchema(BaseModel):
     total_quantity: int = 0
     total_price: float = 0
     paid: bool = Field(default=False)
-    
+class CartRequestSchema(BaseModel):
+    product_id: int
+    quantity: int
+class CartResponseSchema(BaseModel):
+    order_items: List[OrderItemSchema] = []
+    total_quantity: int = 0
+    total_price: float = 0
     
 def cart_helper(cart) -> dict:
     products_list = []
