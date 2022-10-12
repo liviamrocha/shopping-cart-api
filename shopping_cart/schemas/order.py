@@ -1,16 +1,27 @@
-from pydantic import BaseModel
-
-from shopping_cart.schemas.address import Address
+from typing import List
+from pydantic import BaseModel, Field
+from uuid import UUID, uuid4
+from shopping_cart.schemas.address import AddressSchema
 from shopping_cart.schemas.cart import CartSchema
-from shopping_cart.schemas.order_item import OrderItemSchema
+from shopping_cart.schemas.product import ProductSchema
+from shopping_cart.schemas.order_items import OrderItemSchema
+
 
 
 class OrderSchema(BaseModel):
+    order_number: UUID = Field(default_factory=uuid4)
     cart: CartSchema
-    address: Address
+    address: AddressSchema
+
+class OrderItemSchema(BaseModel):
+    product: ProductSchema
+    quantity: int
     
-def order_helper(order):
-    for item in order:
-        del item["user"]["password"]
-        del item["user"]["is_admin"]
-    return order
+class OrderResponseSchema(BaseModel):
+    order_id: str = Field(description="Número do pedido")
+    address: AddressSchema = Field(description="Endereço de entrega")
+    paid: bool = Field(description="Pedido pago?")
+    total_price: float = Field("Valor total do pedido")
+    total_quantity: int = Field("Quantidade de produtos")
+    order_items: List[OrderItemSchema] = Field("Itens do pedido")
+    
