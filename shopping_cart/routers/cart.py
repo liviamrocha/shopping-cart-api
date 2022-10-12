@@ -7,16 +7,11 @@ from shopping_cart.controllers.cart import (
     remove_cart_item, 
     clean_user_cart
 )
-from shopping_cart.schemas.cart import CartItemSchema, CartSchema, CartRequestSchema, CartResponseSchema
-from shopping_cart.schemas.order_item import OrderItemSchema
-from shopping_cart.schemas.user import UserSchema
+from shopping_cart.schemas.cart import CartRequestSchema, CartResponseSchema
+
 
 router = APIRouter(tags=['Carts'], prefix='/carts')
 
-# @router.post('')
-# async def add_cart(cart: CartSchema):
-#     message = await create_cart(cart)
-#     return message
 
 @router.post(
     '/', 

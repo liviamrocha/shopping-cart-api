@@ -1,25 +1,19 @@
-from statistics import quantiles
 from typing import List, Optional
 from operator import neg
 from pydantic import EmailStr
 import shopping_cart.cruds.cart as cart_crud
 from shopping_cart.schemas.user import UserSchema
 from shopping_cart.schemas.cart import (
-    CartSchema, 
-    CartItemSchema,
     CartResponseSchema, 
-    CartRequestSchema,
+    CartRequestSchema
 )
 from shopping_cart.controllers.exceptions.custom_exceptions import (
-    AlreadyExistException,
     NotFoundException,
-    DataConflictException,
     NotAvailableException,
     NotValidException
 )
 from shopping_cart.controllers.product import search_product_by_id
 from shopping_cart.controllers.user import search_user_by_email
-from shopping_cart.server.database import db
 
 
 async def has_cart(email: EmailStr):
@@ -88,10 +82,8 @@ async def remove_cart_item(email: EmailStr, cart_data: CartRequestSchema):
     
     for item in cart["order_items"]:
         if item["product"]["code"] == cart_data.product_id and item["quantity"] > cart_data.quantity:
-            print('Quantidade digitada maior que a quantidade no db')
             await update_item_quantity(email, cart, cart_data, increment=False)
         elif item["product"]["code"] == cart_data.product_id and item["quantity"] == cart_data.quantity:
-            print('Quantidade digitada igual a quantidade no db')
             await cart_crud.delete_cart_item(email, cart_data.product_id)
         
     await update_total_price(email, cart['total_price'], product['price'], cart_data.quantity, increment=False)
@@ -110,10 +102,9 @@ async def clean_user_cart(email: EmailStr):
     return {"message": "All items have been successfully removed"}
 
 async def is_empty_cart(email):
-    cart = cart_crud.find_cart_by_email(email)
-    if cart["total_quantity"] == 0:
-        return True
-    return False
+    check_cart = await cart_crud.find_cart_by_email(email)
+    if check_cart["total_quantity"] == 0:
+        return await cart_crud.delete_cart(email)
 
 async def validate_quantity_to_remove(cart: dict, product_id: int, quantity: int):
     document_quantity = 0
