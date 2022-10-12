@@ -50,7 +50,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
              summary="Test if the access token is valid", 
              response_model=UserSchema
 )
-async def test_token(user: UserSchema = Depends(get_current_user)):
+async def test_token(user: UserSchema, current_user: UserSchema = Depends(get_current_user)):
     return user
 
 
@@ -104,7 +104,7 @@ async def post_user(user: UserSchema):
     description="Search for all registered users.",
     response_model=List[UserResponse]
 )
-async def get_users():
+async def get_users(current_user: UserSchema = Depends(get_current_user)):
     users_list = await get_all_users()
     return users_list
     
@@ -115,7 +115,7 @@ async def get_users():
     description="Search for a user by e-mail",
     response_model=UserResponse
 )
-async def get_user_by_email(email: EmailStr = Depends(get_current_user)):
+async def get_user_by_email(email: EmailStr, current_user: UserSchema = Depends(get_current_user)):
     user = await search_user_by_email(email)
     return user
     
@@ -127,6 +127,6 @@ async def get_user_by_email(email: EmailStr = Depends(get_current_user)):
     status_code=status.HTTP_202_ACCEPTED,
     response_model=UserResponse 
 ) 
-async def password_update(email: EmailStr, password_data: PasswordUpdateSchema = Depends(get_current_user)):
+async def password_update(email: EmailStr, password_data: PasswordUpdateSchema, current_user: UserSchema = Depends(get_current_user)):
     updated_user =  await update_user_password(email, password_data)
     return updated_user
