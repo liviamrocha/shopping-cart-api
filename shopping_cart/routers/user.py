@@ -1,31 +1,42 @@
-from fastapi import APIRouter, status
-from typing import List
+from fastapi import APIRouter, Body, Depends, status, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from typing import Any, List
+import jwt
+from pydantic import ValidationError
 from pydantic.networks import EmailStr
+from shopping_cart.dependencies.user_deps import get_current_user
+from shopping_cart.core.security import create_access_token, create_refresh_token
+from shopping_cart.core.security import create_access_token, create_refresh_token, settings_auth
+from shopping_cart.schemas.auth_schema import TokenPayload, TokenSchema
 from shopping_cart.schemas.user import (
     PasswordUpdateSchema, 
-    UserSchema, 
-    UserResponse
+    UserSchema,
+    UserResponse,
+    AuthenticationResponseSchema
 )
 from shopping_cart.controllers.user import (
-    create_new_user,
+    UserService,
     get_all_users,
     search_user_by_email,
     update_user_password,
     delete_user
 )
+from shopping_cart.controllers.user import UserService
+
 
 
 router = APIRouter(tags=['User'], prefix='/user')
+
 
 @router.post(
     '/', 
     summary="Create user",
     description="Registration of a new user",
     status_code=status.HTTP_201_CREATED,
-    response_model=UserSchema
+    response_model=AuthenticationResponseSchema
 )
 async def post_user(user: UserSchema):
-    new_user = await create_new_user(user)
+    new_user = await UserService.create_user_security(user)
     return new_user
 
 
@@ -35,7 +46,7 @@ async def post_user(user: UserSchema):
     description="Search for all registered users.",
     response_model=List[UserResponse]
 )
-async def get_users():
+async def get_users(current_user: UserSchema = Depends(get_current_user)):
     users_list = await get_all_users()
     return users_list
     
@@ -46,7 +57,7 @@ async def get_users():
     description="Search for a user by e-mail",
     response_model=UserResponse
 )
-async def get_user_by_email(email: EmailStr):
+async def get_user_by_email(email: EmailStr, current_user: UserSchema = Depends(get_current_user)):
     user = await search_user_by_email(email)
     return user
     
@@ -56,9 +67,9 @@ async def get_user_by_email(email: EmailStr):
     summary="Update password",
     description="Update user password",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=UserResponse 
+    response_model=AuthenticationResponseSchema 
 ) 
-async def password_update(email: EmailStr, password_data: PasswordUpdateSchema):
+async def password_update(email: EmailStr, password_data: PasswordUpdateSchema, current_user: UserSchema = Depends(get_current_user)):
     updated_user =  await update_user_password(email, password_data)
     return updated_user
 
@@ -69,6 +80,6 @@ async def password_update(email: EmailStr, password_data: PasswordUpdateSchema):
     summary="Delete user",
     description="Delete user by e-mail",
 )
-async def delete_user_by_email(email: EmailStr):
+async def delete_user_by_email(email: EmailStr, current_user: UserSchema = Depends(get_current_user)):
     user = await delete_user(email)
     return user

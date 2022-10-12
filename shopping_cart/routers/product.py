@@ -1,10 +1,11 @@
 from typing import List
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 from shopping_cart.schemas.product import (
     ProductSchema, 
     ProductUpdateSchema, 
     ProductResponse
 )
+from shopping_cart.dependencies.user_deps import get_current_user
 from shopping_cart.controllers.product import (
     insert_new_product,
     get_all_products,
@@ -13,6 +14,7 @@ from shopping_cart.controllers.product import (
     update_product_by_id,
     delete_product_by_id
 )
+from shopping_cart.schemas.user import UserSchema
 
 
 router = APIRouter(tags=['Products'], prefix='/products')
@@ -24,7 +26,7 @@ router = APIRouter(tags=['Products'], prefix='/products')
     status_code=status.HTTP_201_CREATED,
     response_model=ProductResponse
 )
-async def post_product(product: ProductSchema):
+async def post_product(product: ProductSchema, current_user: UserSchema = Depends(get_current_user)):
     new_product = await insert_new_product(product)
     return new_product
 
@@ -37,7 +39,7 @@ async def post_product(product: ProductSchema):
     description="Search for all registered products.",
 
 )
-async def get_products() -> List[ProductResponse]:
+async def get_products(current_user: UserSchema = Depends(get_current_user)) -> List[ProductResponse]:
     products = await get_all_products()
     return products
 
@@ -49,7 +51,7 @@ async def get_products() -> List[ProductResponse]:
     summary="Get product by name",
     description="Search for a product by name",
 )
-async def get_product_by_name(name: str):
+async def get_product_by_name(name: str, current_user: UserSchema = Depends(get_current_user)):
     product = await search_product_by_name(name)
     return product
 
@@ -61,7 +63,7 @@ async def get_product_by_name(name: str):
     summary="Get product by code",
     description="Search for a product by code",
 )
-async def get_product_by_id(id: int):
+async def get_product_by_id(id: int, current_user: UserSchema = Depends(get_current_user)):
     product = await search_product_by_id(id)
     return product
 
@@ -73,7 +75,7 @@ async def get_product_by_id(id: int):
     summary="Update product",
     description="Update product by code",
 ) 
-async def put_product(id: int, product_data: ProductUpdateSchema): 
+async def put_product(id: int, product_data: ProductUpdateSchema, current_user: UserSchema = Depends(get_current_user)): 
     return await update_product_by_id(id, product_data)
 
 
@@ -83,5 +85,5 @@ async def put_product(id: int, product_data: ProductUpdateSchema):
     summary="Delete product",
     description="Remove a product by id",
 )
-async def delete_product(id: int):
+async def delete_product(id: int, current_user: UserSchema = Depends(get_current_user)):
     return await delete_product_by_id(id)
