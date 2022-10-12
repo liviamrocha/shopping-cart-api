@@ -21,10 +21,8 @@ async def get_current_user(token: str = Depends(reusable_oauth)) -> UserSchema:
     try: 
        
         payload = jwt.decode(
-            # O problema está aqui
             token, key=settings_auth.JWT_SECRET_KEY, algorithms=[settings_auth.JWT_ALGORITHM]
         )
-        print(payload)
         token_data = TokenPayload(**payload)
         
         if datetime.fromtimestamp(token_data.exp) < datetime.now():

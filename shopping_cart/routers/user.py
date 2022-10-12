@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Body, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Any, List
+from jose import JWTError
 import jwt
 from pydantic import ValidationError
 from pydantic.networks import EmailStr
@@ -50,8 +51,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
              summary="Test if the access token is valid", 
              response_model=UserSchema
 )
-async def test_token(user: UserSchema, current_user: UserSchema = Depends(get_current_user)):
-    return user
+async def test_token(current_user: UserSchema = Depends(get_current_user)):
+    return current_user
 
 
 @router.post('/refresh',
@@ -64,7 +65,7 @@ async def refresh_token(refresh_token: str = Body(...)):
         )
         token_data = TokenPayload(**payload)
 
-    except(jwt.JWTError, ValidationError):
+    except:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
