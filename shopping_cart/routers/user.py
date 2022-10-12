@@ -115,7 +115,7 @@ async def get_users():
     description="Search for a user by e-mail",
     response_model=UserResponse
 )
-async def get_user_by_email(email: EmailStr):
+async def get_user_by_email(email: EmailStr = Depends(get_current_user)):
     user = await search_user_by_email(email)
     return user
     
@@ -127,6 +127,6 @@ async def get_user_by_email(email: EmailStr):
     status_code=status.HTTP_202_ACCEPTED,
     response_model=UserResponse 
 ) 
-async def password_update(email: EmailStr, password_data: PasswordUpdateSchema):
+async def password_update(email: EmailStr, password_data: PasswordUpdateSchema = Depends(get_current_user)):
     updated_user =  await update_user_password(email, password_data)
     return updated_user
