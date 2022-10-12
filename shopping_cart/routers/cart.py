@@ -24,12 +24,13 @@ async def add_item(email: EmailStr, cart_item: CartRequestSchema):
 
 @router.get(
     '/', 
+    status_code=status.HTTP_200_OK,
     response_model=CartResponseSchema,
     summary="Get shopping cart",
     description="Returns user's shopping cart",
 )
 async def get_cart_by_email(email: EmailStr):
-    cart = await fetch_cart_by_email (email)
+    cart = await fetch_cart_by_email(email)
     return cart
 
 @router.delete(

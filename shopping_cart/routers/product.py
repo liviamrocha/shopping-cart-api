@@ -31,6 +31,7 @@ async def post_product(product: ProductSchema):
 
 @router.get(
     '/',
+    status_code=status.HTTP_200_OK,
     response_model=List[ProductResponse],
     summary="Get all registered products.",
     description="Search for all registered products.",
@@ -42,7 +43,8 @@ async def get_products() -> List[ProductResponse]:
 
 
 @router.get(
-    '/name', 
+    '/name',
+    status_code=status.HTTP_200_OK,
     response_model=List[ProductResponse],
     summary="Get product by name",
     description="Search for a product by name",
@@ -53,7 +55,8 @@ async def get_product_by_name(name: str):
 
 
 @router.get(
-    '/id', 
+    '/id',
+    status_code=status.HTTP_200_OK,
     response_model=ProductResponse,
     summary="Get product by code",
     description="Search for a product by code",
