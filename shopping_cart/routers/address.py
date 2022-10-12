@@ -17,7 +17,7 @@ router = APIRouter(tags=['Address'], prefix='/address')
     summary="Add new address",
     description="Register new user address",
     status_code=status.HTTP_201_CREATED,
-    response_model=AddressResponseSchema
+    response_model=AddressSchema
 )
 async def create_address_user(email: EmailStr, address: AddressSchema):
     added_address = await add_new_address(email, address)
@@ -29,7 +29,7 @@ async def create_address_user(email: EmailStr, address: AddressSchema):
     summary="Get user addresses",
     description="Returns all registered user addresses",
     status_code=status.HTTP_200_OK,
-    response_model=List[AddressResponseSchema]
+    response_model=List[AddressSchema]
 )
 async def get_address(email: EmailStr):
     user = await find_addresses_by_email(email)
@@ -42,5 +42,7 @@ async def get_address(email: EmailStr):
     description="Remove one of the addresses registered by the user",
     status_code=status.HTTP_200_OK
 )
-async def delete_user_address(email: EmailStr, address_id: str):
-    return await delete_address(email, address_id)
+async def delete_user_address(email: EmailStr, address: AddressSchema):
+    return await delete_address(email, address)
+
+

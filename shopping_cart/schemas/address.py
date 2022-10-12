@@ -5,10 +5,7 @@ from pydantic import BaseModel, Field
 
 
 class AddressSchema(BaseModel):
-    address_id: str = Field(
-        default=str(uuid1()),
-        description="Código do endereço"
-    )
+
     street: str = Field(
         min_length=3, 
         max_length=200,
@@ -51,10 +48,6 @@ class AddressSchema(BaseModel):
         }
 
 class AddressResponseSchema(BaseModel):
-    address_id: str = Field(
-        default=str(uuid1()),
-        description="Código do endereço"
-    )
     street: str = Field(
         min_length=3, 
         max_length=200,

@@ -1,5 +1,4 @@
 from typing import List, Optional
-from datetime import datetime
 from pydantic import EmailStr
 from shopping_cart.server.database import db
 from shopping_cart.schemas.user import UserSchema
@@ -29,9 +28,9 @@ async def find_addresses_by_email(email: EmailStr):
     address_document = await db.address_db.find_one({"user.email": email})
     return address_document
 
-async def find_address_document(email: EmailStr, address_id: str):
+async def find_address(email: EmailStr, address: AddressSchema):
     address_document = await db.address_db.find_one(
-        {"user.email": email, "address.address_id": address_id},
+        {"user.email": email, "address": address},
     )
     return address_document
 
@@ -46,29 +45,23 @@ async def get_delivery_address(email: EmailStr):
                 break
     return delivery_address
 
-async def delete_address(email, address_id: str):
+async def delete_address(email, address: AddressSchema):
     deleted_adresses = await db.address_db.update_one(
         {'user.email': email}, 
-        {"$pull": {"address": {"address_id": address_id}}}
+        { "$pull": { "address": address } }
     )
     return deleted_adresses.modified_count > 0
-
-
-async def delete_address_document(email):
-    document = await db.address_db.delete_one(
-        {'user.email': email}
-    )
-    return document
 
 async def update_delivered_address(email: EmailStr):
     updated_adresses = await db.address_db.find_one_and_update(
         {'user.email': email, "address.is_delivery": True}, 
-        { "$set": {"address.$.is_delivery": False, "updated_at": datetime.now()}}
+        { "$set": { "address.$.is_delivery": False } }
     )
     return updated_adresses
 
 async def update_delivered_automatically(email: EmailStr):
     await db.address_db.find_one_and_update(
         {"user.email": email},
-        {"$set" : {"address.0.is_delivery" : True, "updated_at": datetime.now()}}
+        {"$set" : {"address.0.is_delivery" : True}}
     )
+
