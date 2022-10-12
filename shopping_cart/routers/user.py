@@ -15,7 +15,6 @@ from shopping_cart.schemas.user import (
 )
 from shopping_cart.controllers.user import (
     UserService,
-    create_new_user,
     get_all_users,
     search_user_by_email,
     update_user_password,

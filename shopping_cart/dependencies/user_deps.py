@@ -3,15 +3,13 @@ from pydantic import ValidationError
 from fastapi import HTTPException, status
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
+# from jose import jwt, JWTError
 from shopping_cart.controllers.user import UserService
 from shopping_cart.schemas.auth_schema import TokenPayload
 from shopping_cart.schemas.user import UserSchema
 from shopping_cart.auth.auth_handler import settings_auth
-from shopping_cart.core import settings
+from jose import JWTError, jwt
 
-
-env = settings.get_environment_variables()
 
 reusable_oauth = OAuth2PasswordBearer(
     tokenUrl="/user/login",
@@ -20,11 +18,13 @@ reusable_oauth = OAuth2PasswordBearer(
 
 
 async def get_current_user(token: str = Depends(reusable_oauth)) -> UserSchema:
-    try:  
+    try: 
+       
         payload = jwt.decode(
             # O problema está aqui
-            token, settings_auth.JWT_SECRET_KEY, algorithms=[settings_auth.JWT_ALGORITHM]
+            token, key=settings_auth.JWT_SECRET_KEY, algorithms=[settings_auth.JWT_ALGORITHM]
         )
+        print(payload)
         token_data = TokenPayload(**payload)
         
         if datetime.fromtimestamp(token_data.exp) < datetime.now():
@@ -33,7 +33,7 @@ async def get_current_user(token: str = Depends(reusable_oauth)) -> UserSchema:
                 detail="Token expired",
                 headers={"WWW-Authenticate": "Bearer"}
             )
-    except(jwt.JWTError, ValidationError):
+    except(JWTError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
