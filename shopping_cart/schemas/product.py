@@ -81,7 +81,5 @@ class ProductUpdateSchema(ProductSchema, metaclass=AllOptional):
                 "best_uses": "string"
             }
         }
-class ProductResponse(ProductSchema):
+class ProductResponse(ProductSchema, metaclass=AllOptional):
     pass
-
-    
