@@ -122,7 +122,7 @@ uvicorn --reload main:app
 
 <img style="center;" src="./extras/db.png">
 
-## <img style="left;" src="./extras/videogame.jpeg"> Testes
+## <img style="left;" src="./extras/game.png"> Testes
 Nossos testes atingiram a cobertura de **77%**.
 
 ```
