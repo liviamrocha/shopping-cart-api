@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from fastapi import status
 from fastapi.testclient import TestClient
 from shopping_cart.dependencies.user_deps import get_current_user
