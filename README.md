@@ -23,7 +23,7 @@ Esse projeto tem como objetivo a criação de um serviço de carrinho de compras
 
 <p align="center">
   <a href="#heavy_check_mark-requisitos-funcionais">Requisitos funcionais</a>&nbsp;&nbsp;|&nbsp;
-  <a href="#-squad-sparck-girls">Colaboradoras</a>
+  <a href="#-squad-sparck-girls">Tribo PyToys</a>
 </p>
 
 
