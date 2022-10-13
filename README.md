@@ -21,10 +21,7 @@
 Esse projeto tem como objetivo a criação de um serviço de carrinho de compras, da categoria brinquedos, utilizando arquitetura REST API, a partir do *framework* fastAPI, onde os registros são salvos no banco de dados MongoDB 
 
 
-<p align="center">
-  <a href="#heavy_check_mark-requisitos-funcionais">Requisitos funcionais</a>&nbsp;&nbsp;|&nbsp;
-  <a href="#-squad-sparck-girls">Tribo PyToys</a>
-</p>
+
 
 
 ## <img style="left;" src="./extras/cabeca.png"> Requisitos funcionais
