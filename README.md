@@ -16,9 +16,10 @@
 </p>
 
 
+
 ## <img style="left;" src="./extras/robo_t.png"> Objetivo do projeto
 
-Esse projeto tem como objetivo a criação de um serviço de carrinho de compras, da categoria brinquedos, utilizando arquitetura REST API, a partir do *framework* fastAPI, onde os registros são salvos no banco de dados MongoDB 
+Este projeto tem como objetivo o desenvolvimento de uma **API RESTful** para a categoria *brinquedos* de um carrinho de compras. Para tanto, o projeto foi implementado em arquitetura **Model-View-Controller (MVC)** utilizando o framework web **FastAPI** e o banco de dados não-relacional **MongoDB**. 
 
 
 
@@ -26,104 +27,57 @@ Esse projeto tem como objetivo a criação de um serviço de carrinho de compras
 
 ## <img style="left;" src="./extras/cabeca.png"> Requisitos funcionais
 
-### API com as seguintes funcionalidades:
 
-- Gerenciamento de clientes: Cadastro, busca,  atualização de senha e remoção;
-- Gerenciamento de endereços: Cadastro, busca e remoção;
-- Gerenciamento de produtos: Cadastro, busca, atualização e remoção;
-- Gerenciamento de carrinho de compras: Criação, inclusão/remoção de produtos e remoção do carrinho;
-- Gerenciamento de pedidos: Criação e buscas.
+:heavy_check_mark: **Gerenciamento de clientes:** Cadastro, busca,  atualização de senha e remoção;
 
-### Opcionais:
+:heavy_check_mark: **Gerenciamento de endereços:** Cadastro, busca e remoção;
 
-:heavy_check_mark: Remover um cliente;
+:heavy_check_mark: **Gerenciamento de produtos:** Cadastro, busca, atualização, remoção;
 
-:heavy_check_mark: Remover um endereço;
+:heavy_check_mark: **Gerenciamento de carrinho de compras:** Criação, inclusão/remoção de produtos e remoção do carrinho;
 
-:heavy_check_mark: Remover um produto;
-
-:heavy_check_mark: Validar se a quantidade de itens está disponível em estoque;
-
-:heavy_check_mark: Após validar a quantidade de itens, reduzir do estoque a quantidade de itens adicionados no carrinho (Muito opcional);
-
-:heavy_check_mark: Consultar pedidos;
-
-:heavy_check_mark: Consultar os produtos e suas quantidades em pedidos;
-
-:heavy_check_mark: Consultar quantos pedidos os clientes possuem;
-
-:heavy_check_mark: Identificar o endereço de entrega;
-
-:heavy_check_mark: Associar um identificador ao carrinho de compras como sendo o número do pedido;
-
-:heavy_check_mark: Excluir carrinho do cliente.
+:heavy_check_mark: **Gerenciamento de pedidos:** Criação e busca.
 
 
 
 ## <img style="left;" src="./extras/pingu_t.png"> Regras de negócio
 
 
-- Cada cliente terá seu próprio cadastro, validado pelo e-mail;
-- Para atualização de senha o cliente precisa fornecer o e-mail e a senha atual junto à nova senha;
-- Cada cliente poderá cadastrar quantos endereços quiser;
-- Para atualização de produtos é necessário fornecer o código correspondente e a informação que ele deseja atualizar;
-- Cada cliente poderá conter apenas **um** carrinho de compras aberto, validado pelo e-mail;
-- A quantidade de carrinhos fechados por cliente é ilimitada;
+- Cada usuário poderá ter somente um cadastro, validado por e-mail;
+- Para atualização de senha o usuário precisa fornecer o e-mail e a senha atual em conjunto com a nova senha;
+- Cada usuário poderá cadastrar quantos endereços quiser;
+- Para atualização de produtos é necessário fornecer o seu código único e a informação que ele deseja atualizar;
+- O carrinho de compras aberto foi interpretado como o carrinho em si e o carrinho de compras fechado seria o pedido de compra efetuado pelo usuário.
+- Cada cliente poderá conter apenas **um** carrinho de compras, validado pelo e-mail;
+- A quantidade de pedidos (carrinhos fechados) por cliente é ilimitada;
 - Um carrinho de compras aberto não precisa necessariante possuir produtos;
 - Na criação de um pedido (carrinho fechado), o parametro *paid* é alterado para *True* e o carrinho aberto é excluido;
-- No carrinho de compras fechado não será possível fazer alteração de produtos, pois ele é um pedido que o usuário finalizou anteriormente.
+- Após o fechamento de um pedido não será mais possível realizar alterações em suas informações.
 
 
-## <img style="left;" src="./extras/piao_t.png"> Rodando o projeto na sua máquina
+## <img style="left;" src="./extras/piao_t.png"> Executando o projeto na sua máquina
 
 
 Passo a passo para execução do projeto:
 
-1) Criar um arquivo .env na raiz do projeto para configuração das variáveis de ambiente do banco de dados.
+1) Criar um arquivo .env na raiz do projeto para configuração das variáveis de ambiente do banco de dados (para mais detalhes ver arquivo .env-example.txt).
 
-2) Criar ambiente virtual
-
+2) Para executar a aplicação utilizando a nossa imagem Docker, execute o seguinte comando:
 ```
-Windows: python3 -m venv venv
-Linux: virtualenv venv
+docker-compose up
 ```
 
-3) Ativar ambiente virtual
+## <img style="left;" src="./extras/blocos_t.png"> Deploy e Documentação Swagger 
+O deploy da aplicação foi realizado através do Heroku. A documentação de todas as rotas da API pode ser acessada através do seguinte link: https://pytoys-api.herokuapp.com/docs.
 
-```
-Windows: venv\Scripts\activate.bat
-Linux: source venv/bin/activate
-```
-
-
-4) Instalar as dependências
-```
-pip install -r requirements.txt
-pip install -r requirements-test.txt
-```
-
-5) Subir o servidor FastApi
-```
-uvicorn --reload main:app
-```
-
-
-## <img style="left;" src="./extras/blocos_t.png"> Documentação Swagger
-
-><sup> Acesse nossa documentação aqui:</sup>
-
-<a href="https://pytoys-api.herokuapp.com/docs#/" target="_blank"><img src="https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white" target="_blank" width="100" height="40"></a>
-
-<img style="left;" src="./extras/sw1.png">
-
-<img style="left;" src="./extras/sw2.png">
+<img style="left;" src="./extras/documentation.gif">
 
 ## <img style="left;" src="./extras/dino_t.png">Banco de dados
 
-<img style="center;" src="./extras/db.png">
+<img style="center;" src="./extras/database.png">
 
 ## <img style="left;" src="./extras/game.png"> Testes
-Nossos testes atingiram a cobertura de **77%**.
+Os testes automatizados foram desenvolvidos através da utilização do framework **pytest**. Abaixo segue a cobertura total para todas as rotas da aplicação: 
 
 ```
 
