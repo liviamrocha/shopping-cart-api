@@ -38,6 +38,14 @@ Este projeto tem como objetivo o desenvolvimento de uma **API RESTful** para a c
 
 :heavy_check_mark: **Gerenciamento de pedidos:** Criação e busca.
 
+## <img style="left;" src="./extras/game.png"> Entregas extras
+:heavy_check_mark: Criação de testes unitários;
+
+:heavy_check_mark: Autenticação/Login da API (JWT);
+
+:heavy_check_mark: Deploy com Heroku e Docker
+
+:heavy_check_mark: Documentação Swagger/OpenAPI
 
 
 ## <img style="left;" src="./extras/pingu_t.png"> Regras de negócio
@@ -67,13 +75,17 @@ Passo a passo para execução do projeto:
 docker-compose up
 ```
 
+## <img style="left;" src="./extras/blocos_t.png"> Arquitetura do projeto
+Abaixo segue o esquema de arquitetura em camadas utilizado para o desenvolvimento da nossa aplicação:
+<a href="https://ibb.co/t3N6m5v"><img src="https://i.ibb.co/rvLh7Jz/arq2.png" alt="arq2" border="0" /></a>
+
 ## <img style="left;" src="./extras/blocos_t.png"> Deploy e Documentação Swagger 
 O deploy da aplicação foi realizado através do Heroku. A documentação de todas as rotas da API pode ser acessada através do seguinte link: https://pytoys-api.herokuapp.com/docs.
 
 <img style="left;" src="./extras/documentation.gif">
 
 ## <img style="left;" src="./extras/dino_t.png">Banco de dados
-
+Abaixo estão descritos todos os schemas utilizados nas collections registradas no nosso banco de dados MongoDB:
 <img style="center;" src="./extras/database.png">
 
 ## <img style="left;" src="./extras/game.png"> Testes
